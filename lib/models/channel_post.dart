@@ -3,6 +3,7 @@ class ChannelPost {
   final String channelId;
   final String title;
   final String content;
+  final String contentType; // 'markdown' или 'quill'
   final String? imageUrl;
   final String? videoUrl;
   final DateTime createdAt;
@@ -13,6 +14,7 @@ class ChannelPost {
     required this.channelId,
     required this.title,
     required this.content,
+    this.contentType = 'markdown', // По умолчанию markdown для обратной совместимости
     this.imageUrl,
     this.videoUrl,
     required this.createdAt,
@@ -25,6 +27,7 @@ class ChannelPost {
       'channelId': channelId,
       'title': title,
       'content': content,
+      'contentType': contentType,
       'imageUrl': imageUrl,
       'videoUrl': videoUrl,
       'createdAt': createdAt.millisecondsSinceEpoch,
@@ -38,6 +41,7 @@ class ChannelPost {
       channelId: map['channelId'] ?? '',
       title: map['title'] ?? '',
       content: map['content'] ?? '',
+      contentType: map['contentType'] ?? 'markdown', // По умолчанию markdown
       imageUrl: map['imageUrl'],
       videoUrl: map['videoUrl'],
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] ?? DateTime.now().millisecondsSinceEpoch),

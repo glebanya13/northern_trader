@@ -90,6 +90,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isDesktop = size.width > 600;
+    final maxWidth = isDesktop ? 400.0 : double.infinity;
 
     return Scaffold(
       appBar: AppBar(
@@ -100,23 +102,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(18.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  _isSignUp ? 'Регистрация' : 'Вход',
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxWidth),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    _isSignUp ? 'Регистрация' : 'Вход',
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40),
-                
-                TextField(
-                  controller: emailController,
+                  const SizedBox(height: 40),
+                  
+                  TextField(
+                    controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   style: const TextStyle(color: textColor),
                   decoration: InputDecoration(
@@ -128,24 +132,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: dividerColor),
+                      borderSide: const BorderSide(color: cardColor, width: 1),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: dividerColor),
+                      borderSide: const BorderSide(color: cardColor, width: 1),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: limeGreen, width: 2),
+                      borderSide: const BorderSide(color: cardColor, width: 1),
                     ),
-                    fillColor: cardColor,
+                    fillColor: inputFieldColor,
                     filled: true,
                     hintStyle: TextStyle(color: greyColor),
                   ),
-                ),
-                const SizedBox(height: 16),
-                
-                TextField(
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  TextField(
                   controller: passwordController,
                   obscureText: _obscurePassword,
                   style: const TextStyle(color: textColor),
@@ -169,42 +173,43 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: dividerColor),
+                      borderSide: const BorderSide(color: cardColor, width: 1),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: dividerColor),
+                      borderSide: const BorderSide(color: cardColor, width: 1),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: limeGreen, width: 2),
+                      borderSide: const BorderSide(color: cardColor, width: 1),
                     ),
-                    fillColor: cardColor,
+                    fillColor: inputFieldColor,
                     filled: true,
                     hintStyle: TextStyle(color: greyColor),
                   ),
-                ),
-                
-                SizedBox(height: size.height * 0.3),
-                SizedBox(
-                  width: 200,
-                  child: CustomButton(
-                    onPressed: _isLoading ? null : handleAuth,
-                    text: _isSignUp ? 'РЕГИСТРАЦИЯ' : 'ВОЙТИ',
-                    isLoading: _isLoading,
                   ),
-                ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: toggleSignUp,
-                  child: Text(
-                    _isSignUp
-                        ? 'Уже есть аккаунт? Войти'
-                        : 'Нет аккаунта? Зарегистрироваться',
-                    style: const TextStyle(color: limeGreen),
+                  
+                  SizedBox(height: size.height * 0.3),
+                  SizedBox(
+                    width: 200,
+                    child: CustomButton(
+                      onPressed: _isLoading ? null : handleAuth,
+                      text: _isSignUp ? 'РЕГИСТРАЦИЯ' : 'ВОЙТИ',
+                      isLoading: _isLoading,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: toggleSignUp,
+                    child: Text(
+                      _isSignUp
+                          ? 'Уже есть аккаунт? Войти'
+                          : 'Нет аккаунта? Зарегистрироваться',
+                      style: const TextStyle(color: textColor),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

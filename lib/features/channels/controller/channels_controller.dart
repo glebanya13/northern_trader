@@ -48,5 +48,13 @@ class ChannelsController {
   Future<void> createChannel(Map<String, dynamic> data) async {
     return channelsRepository.createChannel(data);
   }
+
+  Future<void> updateChannel(String channelId, Map<String, dynamic> data) async {
+    return channelsRepository.updateChannel(channelId, data);
+  }
+
+  Future<void> deleteChannel(String channelId) async {
+    return channelsRepository.deleteChannel(channelId);
+  }
 }
 

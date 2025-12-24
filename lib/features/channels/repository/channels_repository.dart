@@ -120,5 +120,37 @@ class ChannelsRepository {
     final docRef = await firestore.collection('channels').add(data);
     await docRef.update({'id': docRef.id});
   }
+
+  Future<void> updateChannel(String channelId, Map<String, dynamic> data) async {
+    if (channelId.isEmpty) return;
+    await firestore.collection('channels').doc(channelId).update(data);
+  }
+
+  Future<void> deleteChannel(String channelId) async {
+    if (channelId.isEmpty) return;
+    
+    final postsSnapshot = await firestore
+        .collection('channels')
+        .doc(channelId)
+        .collection('posts')
+        .limit(1)
+        .get();
+    
+    if (postsSnapshot.docs.isNotEmpty) {
+      throw Exception('Нельзя удалить канал с постами. Сначала удалите все посты.');
+    }
+    
+    final postsCollection = firestore
+        .collection('channels')
+        .doc(channelId)
+        .collection('posts');
+    
+    final allPosts = await postsCollection.get();
+    for (var post in allPosts.docs) {
+      await post.reference.delete();
+    }
+    
+    await firestore.collection('channels').doc(channelId).delete();
+  }
 }
 
