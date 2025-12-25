@@ -19,11 +19,15 @@ class DisplayTextImageGIF extends StatelessWidget {
     final AudioPlayer audioPlayer = AudioPlayer();
 
     return type == MessageEnum.text
-        ? Text(
-            message,
-            style: const TextStyle(
-              fontSize: 16,
-              color: textColor,
+        ? Container(
+            constraints: const BoxConstraints(),
+            child: Text(
+              message,
+              style: const TextStyle(
+                fontSize: 16,
+                color: textColor,
+                height: 1.2,
+              ),
             ),
           )
         : type == MessageEnum.audio
@@ -47,6 +51,7 @@ class DisplayTextImageGIF extends StatelessWidget {
                   },
                   icon: Icon(
                     isPlaying ? Icons.pause_circle : Icons.play_circle,
+                    color: limeGreen,
                   ),
                 );
               })
@@ -64,13 +69,21 @@ class DisplayTextImageGIF extends StatelessWidget {
                         ? Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.grey[200],
+                              color: cardColorDark,
                               borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: limeGreen.withOpacity(0.3),
+                                width: 1,
+                              ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.insert_drive_file, size: 32),
+                                const Icon(
+                                  Icons.insert_drive_file,
+                                  size: 32,
+                                  color: limeGreen,
+                                ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Column(
@@ -82,6 +95,7 @@ class DisplayTextImageGIF extends StatelessWidget {
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 14,
+                                          color: textColor,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
@@ -89,7 +103,7 @@ class DisplayTextImageGIF extends StatelessWidget {
                                         message,
                                         style: const TextStyle(
                                           fontSize: 12,
-                                          color: Colors.grey,
+                                          color: textColorSecondary,
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,

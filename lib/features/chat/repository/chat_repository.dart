@@ -339,11 +339,22 @@ class ChatRepository {
       String? currentUserId = getCurrentUserId();
       if (currentUserId == null) return;
 
+      // Обновляем в коллекции получателя (текущего пользователя)
       await firestore
           .collection('users')
           .doc(currentUserId)
           .collection('chats')
           .doc(recieverUserId)
+          .collection('messages')
+          .doc(messageId)
+          .update({'isSeen': true});
+      
+      // Обновляем в коллекции отправителя (чтобы он видел, что сообщение прочитано)
+      await firestore
+          .collection('users')
+          .doc(recieverUserId)
+          .collection('chats')
+          .doc(currentUserId)
           .collection('messages')
           .doc(messageId)
           .update({'isSeen': true});

@@ -69,7 +69,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    Icon(Icons.error_outline, color: limeGreen.withOpacity(0.6), size: 48),
                     const SizedBox(height: 16),
                     Text(
                       'Ошибка: ${snapshot.error}',
@@ -100,31 +100,55 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
             );
           }
 
-          return ListView.builder(
-            itemCount: posts.length,
-            padding: const EdgeInsets.all(20),
-            itemBuilder: (context, index) {
-              if (index >= posts.length || posts[index].id.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              final post = posts[index];
-              return GestureDetector(
-                onLongPress: isOwner && post.id.isNotEmpty
-                    ? () => _showPostActions(context, post)
-                    : null,
-                child: PostCard(
-                  post: post,
-                  channel: widget.channel,
-                  showChannelInfo: false,
-                  onTap: () {
-                    if (post.id.isNotEmpty && widget.channel.id.isNotEmpty) {
-                      ref.read(channelsControllerProvider).incrementViews(
-                            widget.channel.id,
-                            post.id,
-                          );
-                      _showPostDetail(context, post, isOwner);
-                    }
-                  },
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final isDesktop = constraints.maxWidth > 900;
+              
+              return Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: isDesktop ? 1200 : double.infinity,
+                  ),
+                  child: ListView.builder(
+                    itemCount: posts.length,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isDesktop ? 24 : 12,
+                      vertical: isDesktop ? 20 : 12,
+                    ),
+                    itemBuilder: (context, index) {
+                      if (index >= posts.length || posts[index].id.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+                      final post = posts[index];
+                      return Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: isDesktop ? 800 : double.infinity,
+                          ),
+                          child: GestureDetector(
+                            onLongPress: isOwner && post.id.isNotEmpty
+                                ? () => _showPostActions(context, post)
+                                : null,
+                            child: PostCard(
+                              post: post,
+                              channel: widget.channel,
+                              showChannelInfo: false,
+                              compact: !isDesktop,
+                              onTap: () {
+                                if (post.id.isNotEmpty && widget.channel.id.isNotEmpty) {
+                                  ref.read(channelsControllerProvider).incrementViews(
+                                        widget.channel.id,
+                                        post.id,
+                                      );
+                                  _showPostDetail(context, post, isOwner);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               );
             },
@@ -151,7 +175,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
         builder: (context, scrollController) => SingleChildScrollView(
           controller: scrollController,
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -231,22 +255,27 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
                                   post.title,
                                   style: const TextStyle(
                                     color: textColor,
-                                    fontSize: 28,
+                                    fontSize: 30,
                                     fontWeight: FontWeight.bold,
                                     height: 1.3,
+                                    letterSpacing: -0.5,
                                   ),
                                 ),
                                 const SizedBox(height: 28),
                                 _buildPostContent(post, isPreview: false),
-                                const SizedBox(height: 24),
+                                const SizedBox(height: 20),
                                 Container(
-                                  padding: const EdgeInsets.all(16),
+                                  padding: const EdgeInsets.all(14),
                                   decoration: BoxDecoration(
-                                    color: appBarColor,
+                                    color: cardColorLight,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: dividerColor, width: 1),
+                                    border: Border.all(
+                                      color: dividerColor.withOpacity(0.3),
+                                      width: 1,
+                                    ),
                                   ),
                                   child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Icon(Icons.visibility_outlined, size: 18, color: greyColor),
                                       const SizedBox(width: 8),
@@ -255,17 +284,24 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
                                         style: const TextStyle(
                                           color: greyColor,
                                           fontSize: 14,
+                                          height: 1.0,
                                         ),
                                       ),
                                       const Spacer(),
-                                      Icon(Icons.calendar_today_outlined, size: 18, color: greyColor),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        DateFormat('dd.MM.yyyy HH:mm').format(post.createdAt),
-                                        style: const TextStyle(
-                                          color: greyColor,
-                                          fontSize: 14,
-                                        ),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.calendar_today_outlined, size: 18, color: greyColor),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            DateFormat('dd.MM.yyyy HH:mm').format(post.createdAt),
+                                            style: const TextStyle(
+                                              color: greyColor,
+                                              fontSize: 14,
+                                              height: 1.0,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -285,7 +321,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -352,11 +388,11 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
                   },
                   borderRadius: BorderRadius.circular(16),
                   child: Padding(
-                    padding: const EdgeInsets.all(18),
+                    padding: const EdgeInsets.all(14),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: limeGreen.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -435,11 +471,11 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
                   },
                   borderRadius: BorderRadius.circular(16),
                   child: Padding(
-                    padding: const EdgeInsets.all(18),
+                    padding: const EdgeInsets.all(14),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: Colors.red.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -780,10 +816,35 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
         } else {
           return AbsorbPointer(
             absorbing: true,
-            child: quill.QuillEditor(
-              controller: controller,
-              focusNode: FocusNode(),
-              scrollController: ScrollController(),
+            child: Builder(
+              builder: (context) => Theme(
+                data: Theme.of(context).copyWith(
+                  textTheme: Theme.of(context).textTheme.copyWith(
+                    bodyLarge: const TextStyle(
+                      color: Color.fromRGBO(220, 220, 220, 1),
+                      fontSize: 17,
+                      height: 1.8,
+                    ),
+                    bodyMedium: const TextStyle(
+                      color: Color.fromRGBO(220, 220, 220, 1),
+                      fontSize: 17,
+                      height: 1.8,
+                    ),
+                  ),
+                ),
+                child: DefaultTextStyle(
+                  style: const TextStyle(
+                    color: Color.fromRGBO(220, 220, 220, 1),
+                    fontSize: 17,
+                    height: 1.8,
+                  ),
+                  child: quill.QuillEditor(
+                    controller: controller,
+                    focusNode: FocusNode(),
+                    scrollController: ScrollController(),
+                  ),
+                ),
+              ),
             ),
           );
         }
@@ -813,24 +874,24 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
           styleSheet: MarkdownStyleSheet(
             p: const TextStyle(
               color: Color.fromRGBO(220, 220, 220, 1),
-              fontSize: 18,
-              height: 1.9,
+              fontSize: 17,
+              height: 1.8,
               letterSpacing: 0.3,
             ),
             h1: const TextStyle(
-              color: Color.fromRGBO(255, 255, 255, 1),
+              color: textColor,
               fontSize: 28,
               fontWeight: FontWeight.bold,
               height: 1.3,
             ),
             h2: const TextStyle(
-              color: Color.fromRGBO(255, 255, 255, 1),
+              color: textColor,
               fontSize: 24,
               fontWeight: FontWeight.bold,
               height: 1.3,
             ),
             h3: const TextStyle(
-              color: Color.fromRGBO(255, 255, 255, 1),
+              color: textColor,
               fontSize: 21,
               fontWeight: FontWeight.bold,
               height: 1.4,
@@ -841,36 +902,40 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
             ),
             listIndent: 24,
             blockquoteDecoration: BoxDecoration(
-              color: const Color.fromRGBO(35, 35, 35, 0.6),
+              color: cardColorLight,
               borderRadius: BorderRadius.circular(8),
-              border: Border(
+              border: const Border(
                 left: BorderSide(color: limeGreen, width: 4),
               ),
             ),
             blockquotePadding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
             blockquote: const TextStyle(
-              color: Color.fromRGBO(200, 200, 200, 1),
+              color: textColorSecondary,
               fontStyle: FontStyle.italic,
-              fontSize: 17,
+              fontSize: 16,
               height: 1.7,
             ),
-            code: const TextStyle(
-              backgroundColor: Color.fromRGBO(35, 35, 35, 1),
+            code: TextStyle(
+              backgroundColor: cardColorLight,
               color: limeGreen,
-              fontSize: 16,
+              fontSize: 15,
               fontFamily: 'monospace',
             ),
             codeblockDecoration: BoxDecoration(
-              color: const Color.fromRGBO(35, 35, 35, 1),
+              color: cardColorLight,
               borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: limeGreen.withOpacity(0.2),
+                width: 1,
+              ),
             ),
             codeblockPadding: const EdgeInsets.all(16),
             strong: const TextStyle(
-              color: Color.fromRGBO(255, 255, 255, 1),
+              color: textColor,
               fontWeight: FontWeight.bold,
             ),
             em: const TextStyle(
-              color: Color.fromRGBO(200, 200, 200, 1),
+              color: textColorSecondary,
               fontStyle: FontStyle.italic,
             ),
             a: const TextStyle(
@@ -881,7 +946,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
             h1Padding: const EdgeInsets.only(top: 32, bottom: 24),
             h2Padding: const EdgeInsets.only(top: 28, bottom: 20),
             h3Padding: const EdgeInsets.only(top: 24, bottom: 18),
-            pPadding: const EdgeInsets.only(bottom: 24),
+            pPadding: const EdgeInsets.only(bottom: 20),
           ),
         );
       }

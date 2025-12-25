@@ -40,7 +40,7 @@ class _ChannelsListScreenState extends ConsumerState<ChannelsListScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                  Icon(Icons.error_outline, color: limeGreen.withOpacity(0.6), size: 48),
                   const SizedBox(height: 16),
                   Text(
                     'Ошибка: ${snapshot.error}',
@@ -108,7 +108,7 @@ class _ChannelsListScreenState extends ConsumerState<ChannelsListScreen> {
                       elevation: 0,
                       child: const Icon(
                         Icons.add_rounded,
-                        color: Colors.white,
+                        color: blackColor,
                         size: 30,
                       ),
                     ),
@@ -118,17 +118,59 @@ class _ChannelsListScreenState extends ConsumerState<ChannelsListScreen> {
         }
 
         return Scaffold(
-          body: ListView.builder(
-            padding: const EdgeInsets.all(20),
-            itemCount: channels.length,
-            itemBuilder: (context, index) {
-              if (index >= channels.length || channels[index].id.isEmpty) {
-                return const SizedBox.shrink();
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              // Определяем количество колонок и соотношение сторон в зависимости от ширины экрана
+              int crossAxisCount;
+              double childAspectRatio;
+              double horizontalPadding;
+              
+              if (constraints.maxWidth > 1200) {
+                crossAxisCount = 5;
+                childAspectRatio = 0.65;
+                horizontalPadding = 24;
+              } else if (constraints.maxWidth > 900) {
+                crossAxisCount = 4;
+                childAspectRatio = 0.68;
+                horizontalPadding = 20;
+              } else if (constraints.maxWidth > 600) {
+                crossAxisCount = 3;
+                childAspectRatio = 0.7;
+                horizontalPadding = 18;
+              } else {
+                // Мобильные устройства - 2 колонки, но больше и читабельнее
+                crossAxisCount = 2;
+                childAspectRatio = 0.75; // Немного выше для лучшей видимости
+                horizontalPadding = 12;
               }
-              final channel = channels[index];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: _ChannelCard(channel: channel),
+
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1400),
+                  child: GridView.builder(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding, 
+                      vertical: constraints.maxWidth <= 600 ? 16 : 20,
+                    ),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      childAspectRatio: childAspectRatio,
+                      crossAxisSpacing: constraints.maxWidth <= 600 ? 12 : 16,
+                      mainAxisSpacing: constraints.maxWidth <= 600 ? 12 : 16,
+                    ),
+                    itemCount: channels.length,
+                    itemBuilder: (context, index) {
+                      if (index >= channels.length || channels[index].id.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+                      final channel = channels[index];
+                      return _ChannelCard(
+                        channel: channel,
+                        isMobile: constraints.maxWidth <= 600,
+                      );
+                    },
+                  ),
+                ),
               );
             },
           ),
@@ -170,7 +212,7 @@ class _ChannelsListScreenState extends ConsumerState<ChannelsListScreen> {
                     elevation: 0,
                     child: const Icon(
                       Icons.add_rounded,
-                      color: Colors.white,
+                      color: blackColor,
                       size: 30,
                     ),
                   ),
@@ -184,36 +226,36 @@ class _ChannelsListScreenState extends ConsumerState<ChannelsListScreen> {
 
 class _ChannelCard extends ConsumerWidget {
   final Channel channel;
+  final bool isMobile;
 
-  const _ChannelCard({required this.channel});
+  const _ChannelCard({
+    required this.channel,
+    this.isMobile = false,
+  });
 
   Widget _buildIconAction({
     required VoidCallback onTap,
     required IconData icon,
     required Color iconColor,
-    required List<Color> gradientColors,
+    required Color backgroundColor,
+    bool isMobile = false,
   }) {
+    final size = isMobile ? 32.0 : 28.0;
+    final iconSize = isMobile ? 18.0 : 16.0;
+    
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         child: Container(
-          width: 38,
-          height: 38,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: gradientColors,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: dividerColor.withOpacity(0.35),
-              width: 1,
-            ),
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: iconColor, size: 20),
+          child: Icon(icon, color: iconColor, size: iconSize),
         ),
       ),
     );
@@ -224,16 +266,26 @@ class _ChannelCard extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: limeGreen.withOpacity(0.2),
+            width: 1.5,
+          ),
+        ),
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.2),
+                color: Colors.red.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.red.withOpacity(0.3),
+                  width: 1.5,
+                ),
               ),
-              child: Icon(Icons.warning_amber_rounded, color: Colors.red[300], size: 24),
+              child: Icon(Icons.warning_amber_rounded, color: Colors.red[400], size: 24),
             ),
             const SizedBox(width: 12),
             const Expanded(
@@ -265,7 +317,7 @@ class _ChannelCard extends ConsumerWidget {
             child: const Text(
               'Отмена',
               style: TextStyle(
-                color: greyColor,
+                color: textColorSecondary,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -288,8 +340,9 @@ class _ChannelCard extends ConsumerWidget {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red[300],
+              backgroundColor: Colors.red[500],
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              elevation: 2,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -315,25 +368,22 @@ class _ChannelCard extends ConsumerWidget {
     
     return Container(
       decoration: BoxDecoration(
+        color: cardColor,
         borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            cardColor,
-            cardColorLight.withOpacity(0.8),
-          ],
+        border: Border.all(
+          color: limeGreen.withOpacity(0.35),
+          width: isMobile ? 2.5 : 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: isMobile ? 12 : 10,
             offset: const Offset(0, 4),
           ),
           BoxShadow(
-            color: limeGreen.withOpacity(0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: limeGreen.withOpacity(0.12),
+            blurRadius: isMobile ? 24 : 20,
+            offset: const Offset(0, 0),
           ),
         ],
       ),
@@ -341,6 +391,8 @@ class _ChannelCard extends ConsumerWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
+          splashColor: limeGreen.withOpacity(0.15),
+          highlightColor: limeGreen.withOpacity(0.08),
           onTap: () {
             if (channel.id.isNotEmpty) {
               Navigator.push(
@@ -353,173 +405,140 @@ class _ChannelCard extends ConsumerWidget {
               );
             }
           },
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: dividerColor.withOpacity(0.5),
-                width: 1,
-              ),
-            ),
-            padding: const EdgeInsets.all(18.0),
-            child: Row(
-              children: [
-                Container(
-                  width: 68,
-                  height: 68,
+          child: Column(
+            children: [
+              // Верхняя часть с логотипом
+              Expanded(
+                flex: 4,
+                child: Container(
+                  width: double.infinity,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        limeGreen.withOpacity(0.3),
-                        limeGreen.withOpacity(0.1),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                    color: cardColorDark,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(17),
+                      topRight: Radius.circular(17),
                     ),
-                    border: Border.all(
-                      color: limeGreen.withOpacity(0.4),
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: limeGreen.withOpacity(0.2),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
                   ),
-                  child: ClipOval(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(17),
+                      topRight: Radius.circular(17),
+                    ),
                     child: channel.imageUrl.isNotEmpty
                         ? CachedNetworkImage(
                             imageUrl: channel.imageUrl,
                             fit: BoxFit.cover,
-                            placeholder: (context, url) => Container(
-                              color: appBarColor,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  color: limeGreen,
-                                  strokeWidth: 2.5,
-                                ),
+                            width: double.infinity,
+                            height: double.infinity,
+                            placeholder: (context, url) => Center(
+                              child: CircularProgressIndicator(
+                                color: limeGreen,
+                                strokeWidth: 3,
                               ),
                             ),
-                            errorWidget: (context, url, error) => Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    appBarColor,
-                                    cardColor,
-                                  ],
-                                ),
-                              ),
-                              child: const Icon(
+                            errorWidget: (context, url, error) => Center(
+                              child: Icon(
                                 Icons.rss_feed_rounded,
-                                size: 34,
-                                color: limeGreen,
+                                size: isMobile ? 80 : 64,
+                                color: greyColor.withOpacity(0.5),
                               ),
                             ),
                           )
-                        : Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  appBarColor,
-                                  cardColor,
-                                ],
-                              ),
-                            ),
-                            child: const Icon(
+                        : Center(
+                            child: Icon(
                               Icons.rss_feed_rounded,
-                              size: 34,
-                              color: limeGreen,
+                              size: isMobile ? 80 : 64,
+                              color: greyColor.withOpacity(0.5),
                             ),
                           ),
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        channel.name,
-                        style: const TextStyle(
-                          color: textColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.3,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        channel.description,
-                        style: const TextStyle(
-                          color: textColorSecondary,
-                          fontSize: 14,
-                          height: 1.4,
-                          letterSpacing: 0.2,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+              ),
+              
+              // Нижняя часть с названием и описанием
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(isMobile ? 16 : 14),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      cardColorLight,
+                      cardColorDark,
                     ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(17),
+                    bottomRight: Radius.circular(17),
                   ),
                 ),
-                const SizedBox(width: 8),
-                if (isOwner)
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildIconAction(
-                        onTap: () {
-                          if (channel.id.isEmpty) {
-                            showSnackBar(context: context, content: 'Ошибка: ID канала пустой');
-                            return;
-                          }
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditChannelScreen(channel: channel),
-                            ),
-                          );
-                        },
-                        icon: Icons.edit_outlined,
-                        iconColor: limeGreen,
-                        gradientColors: [
-                          limeGreen.withOpacity(0.18),
-                          limeGreen.withOpacity(0.06),
-                        ],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      channel.name,
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: isMobile ? 18 : 17,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.3,
                       ),
-                      const SizedBox(height: 10),
-                      _buildIconAction(
-                        onTap: () => _deleteChannel(context, ref),
-                        icon: Icons.delete_outline,
-                        iconColor: Colors.red[400]!,
-                        gradientColors: [
-                          Colors.red.withOpacity(0.18),
-                          Colors.red.withOpacity(0.06),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: isMobile ? 8 : 6),
+                    Text(
+                      channel.description,
+                      style: TextStyle(
+                        color: textColorSecondary,
+                        fontSize: isMobile ? 14 : 13,
+                        height: 1.4,
+                        letterSpacing: 0.1,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                    // Кнопки действий для владельца
+                    if (isOwner) ...[
+                      SizedBox(height: isMobile ? 10 : 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          _buildIconAction(
+                            onTap: () {
+                              if (channel.id.isEmpty) {
+                                showSnackBar(context: context, content: 'Ошибка: ID канала пустой');
+                                return;
+                              }
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditChannelScreen(channel: channel),
+                                ),
+                              );
+                            },
+                            icon: Icons.edit_outlined,
+                            iconColor: limeGreen,
+                            backgroundColor: limeGreen.withOpacity(0.2),
+                            isMobile: isMobile,
+                          ),
+                          SizedBox(width: isMobile ? 8 : 6),
+                          _buildIconAction(
+                            onTap: () => _deleteChannel(context, ref),
+                            icon: Icons.delete_outline,
+                            iconColor: Colors.red[400]!,
+                            backgroundColor: Colors.red.withOpacity(0.2),
+                            isMobile: isMobile,
+                          ),
                         ],
                       ),
                     ],
-                  )
-                else
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: limeGreen.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: limeGreen,
-                      size: 18,
-                    ),
-                  ),
-              ],
-            ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

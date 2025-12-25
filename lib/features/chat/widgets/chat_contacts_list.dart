@@ -62,7 +62,7 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                        Icon(Icons.error_outline, color: limeGreen.withOpacity(0.6), size: 48),
                         const SizedBox(height: 16),
                         Text(
                           'Ошибка: ${snapshot.error}',
@@ -99,25 +99,22 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
+                      color: cardColor,
                       borderRadius: BorderRadius.circular(20),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          cardColor,
-                          cardColorLight.withOpacity(0.8),
-                        ],
+                      border: Border.all(
+                        color: limeGreen.withOpacity(0.4),
+                        width: 2,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.25),
+                          color: Colors.black.withOpacity(0.3),
                           blurRadius: 10,
-                          offset: const Offset(0, 4),
+                          offset: const Offset(0, 3),
                         ),
                         BoxShadow(
-                          color: limeGreen.withOpacity(0.08),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
+                          color: limeGreen.withOpacity(0.15),
+                          blurRadius: 20,
+                          offset: const Offset(0, 0),
                         ),
                       ],
                     ),
@@ -138,36 +135,21 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                           );
                         },
                         child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: dividerColor.withOpacity(0.5),
-                              width: 1,
-                            ),
-                          ),
                           padding: const EdgeInsets.all(14.0),
                           child: Row(
                             children: [
                               Container(
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      limeGreen.withOpacity(0.3),
-                                      limeGreen.withOpacity(0.1),
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
                                   border: Border.all(
-                                    color: limeGreen.withOpacity(0.4),
+                                    color: limeGreen.withOpacity(0.5),
                                     width: 2.5,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
                                       color: limeGreen.withOpacity(0.2),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
                                     ),
                                   ],
                                 ),
@@ -181,16 +163,11 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                                       ? Container(
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                appBarColor,
-                                                cardColor,
-                                              ],
-                                            ),
+                                            color: limeGreen.withOpacity(0.15),
                                           ),
-                                          child: const Icon(
+                                          child: Icon(
                                             Icons.person_rounded,
-                                            color: limeGreen,
+                                            color: limeGreen.withOpacity(0.8),
                                             size: 32,
                                           ),
                                         )
@@ -245,7 +222,7 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                                       style: const TextStyle(
                                         color: limeGreen,
                                         fontSize: 12,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),
@@ -320,7 +297,7 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, color: Colors.red, size: 48),
+              Icon(Icons.error_outline, color: limeGreen.withOpacity(0.6), size: 48),
               const SizedBox(height: 16),
               Text(
                 'Ошибка: $error',

@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:northern_trader/common/repositories/common_firebase_storage_repository.dart';
 import 'package:northern_trader/common/utils/utils.dart';
 import 'package:northern_trader/features/auth/screens/user_information_screen.dart';
+import 'package:northern_trader/features/auth/screens/login_screen.dart';
 import 'package:northern_trader/models/user_model.dart';
 import 'package:northern_trader/mobile_layout_screen.dart';
-import 'package:northern_trader/features/landing/screens/landing_screen.dart';
 
 final authRepositoryProvider = Provider(
   (ref) => AuthRepository(
@@ -222,7 +222,7 @@ class AuthRepository {
       if (context.mounted) {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const LandingScreen()),
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
           (route) => false,
         );
       }

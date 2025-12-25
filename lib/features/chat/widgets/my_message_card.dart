@@ -26,15 +26,12 @@ class MyMessageCard extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width - 60,
         ),
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                messageColor,
-                messageColor.withOpacity(0.85),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            color: cardColorLight,
+            border: Border.all(
+              color: limeGreen.withOpacity(0.6),
+              width: 2,
             ),
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20),
@@ -44,68 +41,52 @@ class MyMessageCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: messageColor.withOpacity(0.3),
+                color: Colors.black.withOpacity(0.3),
                 blurRadius: 8,
-                offset: const Offset(0, 3),
+                offset: const Offset(0, 2),
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+                color: limeGreen.withOpacity(0.15),
+                blurRadius: 16,
+                offset: const Offset(0, 0),
               ),
             ],
           ),
-          child: Stack(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
                 padding: type == MessageEnum.text
                     ? const EdgeInsets.only(
                         left: 14,
                         right: 14,
-                        top: 10,
-                        bottom: 24,
+                        top: 16,
+                        bottom: 8,
                       )
                     : const EdgeInsets.only(
                         left: 8,
                         top: 8,
                         right: 8,
-                        bottom: 28,
+                        bottom: 8,
                       ),
                 child: DisplayTextImageGIF(
                   message: message,
                   type: type,
                 ),
               ),
-              Positioned(
-                bottom: 6,
-                right: 12,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        date,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        isSeen ? Icons.done_all_rounded : Icons.done_rounded,
-                        size: 16,
-                        color: isSeen ? Colors.lightBlue : Colors.white70,
-                      ),
-                    ],
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 14,
+                  right: 14,
+                  bottom: 8,
+                ),
+                child: Text(
+                  date,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: textColorSecondary,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),

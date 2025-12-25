@@ -91,6 +91,9 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
                   controller: _messageController,
                   textAlign: TextAlign.left,
                   textAlignVertical: TextAlignVertical.center,
+                  style: const TextStyle(
+                    color: textColor,
+                  ),
                   onChanged: (val) {
                     setState(() {
                       isShowSendButton = val.trim().isNotEmpty;
@@ -98,7 +101,7 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
                   },
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: mobileChatBoxColor,
+                    fillColor: cardColor,
                     prefixIcon: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: SizedBox(
@@ -109,7 +112,7 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
                               onPressed: toggleEmojiKeyboardContainer,
                               icon: const Icon(
                                 Icons.emoji_emotions,
-                                color: Colors.grey,
+                                color: limeGreen,
                               ),
                             ),
                           ],
@@ -117,11 +120,28 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
                       ),
                     ),
                     hintText: 'Введите сообщение',
+                    hintStyle: TextStyle(
+                      color: textColorSecondary.withOpacity(0.7),
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20.0),
-                      borderSide: const BorderSide(
-                        width: 0,
-                        style: BorderStyle.none,
+                      borderSide: BorderSide(
+                        color: greyColor.withOpacity(0.3),
+                        width: 1.5,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                      borderSide: BorderSide(
+                        color: greyColor.withOpacity(0.3),
+                        width: 1.5,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                      borderSide: BorderSide(
+                        color: limeGreen.withOpacity(0.8),
+                        width: 2,
                       ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
@@ -146,8 +166,8 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
                               limeGreenDark,
                             ]
                           : [
-                              Colors.grey[700]!,
-                              Colors.grey[800]!,
+                              cardColorLight,
+                              cardColor,
                             ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -155,12 +175,18 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
                     boxShadow: isShowSendButton
                         ? [
                             BoxShadow(
-                              color: limeGreen.withOpacity(0.4),
-                              blurRadius: 12,
+                              color: limeGreen.withOpacity(0.5),
+                              blurRadius: 16,
                               offset: const Offset(0, 4),
                             ),
                           ]
-                        : [],
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                   ),
                   child: Material(
                     color: Colors.transparent,
@@ -174,7 +200,7 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
                         alignment: Alignment.center,
                         child: Icon(
                           Icons.send_rounded,
-                          color: Colors.white,
+                          color: isShowSendButton ? blackColor : greyColor,
                           size: 22,
                         ),
                       ),

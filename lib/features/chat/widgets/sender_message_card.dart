@@ -24,16 +24,9 @@ class SenderMessageCard extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width - 60,
         ),
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                cardColorLight,
-                senderMessageColor,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: cardColor,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
@@ -41,57 +34,52 @@ class SenderMessageCard extends StatelessWidget {
               bottomRight: Radius.circular(20),
             ),
             border: Border.all(
-              color: dividerColor.withOpacity(0.3),
-              width: 1,
+              color: greyColor.withOpacity(0.3),
+              width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 6,
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
             ],
           ),
-          child: Stack(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
                 padding: type == MessageEnum.text
                     ? const EdgeInsets.only(
                         left: 14,
                         right: 14,
-                        top: 10,
-                        bottom: 24,
+                        top: 16,
+                        bottom: 8,
                       )
                     : const EdgeInsets.only(
                         left: 8,
                         top: 8,
                         right: 8,
-                        bottom: 28,
+                        bottom: 8,
                       ),
                 child: DisplayTextImageGIF(
                   message: message,
                   type: type,
                 ),
               ),
-              Positioned(
-                bottom: 6,
-                right: 12,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: appBarColor.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    date,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: greyColor,
-                      fontWeight: FontWeight.w500,
-                    ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 14,
+                  right: 14,
+                  bottom: 8,
+                ),
+                child: Text(
+                  date,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: textColorSecondary,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),

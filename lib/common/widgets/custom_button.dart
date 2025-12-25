@@ -18,14 +18,19 @@ class CustomButton extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: (onPressed == null || isLoading)
-            ? Colors.grey[700]
+            ? cardColorLight
             : limeGreen,
         boxShadow: (onPressed != null && !isLoading)
             ? [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 8,
+                  color: limeGreen.withOpacity(0.4),
+                  blurRadius: 16,
                   offset: const Offset(0, 4),
+                ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ]
             : null,
@@ -46,13 +51,13 @@ class CustomButton extends StatelessWidget {
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 3,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  valueColor: AlwaysStoppedAnimation<Color>(blackColor),
                 ),
               )
             : Text(
                 text,
                 style: const TextStyle(
-                  color: cardColor,
+                  color: blackColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                   letterSpacing: 0.5,

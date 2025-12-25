@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:dart_quill_delta/dart_quill_delta.dart' as delta;
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:northern_trader/common/utils/colors.dart';
 import 'package:northern_trader/common/utils/utils.dart';
 import 'package:northern_trader/features/channels/controller/channels_controller.dart';
@@ -25,6 +27,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   late final quill.QuillController _quillController;
   final _imageUrlController = TextEditingController();
   bool _isLoading = false;
+  bool _showEmojiPicker = false;
   final FocusNode _editorFocusNode = FocusNode();
 
   @override
@@ -249,6 +252,26 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                         color: dividerColor,
                       ),
                       const SizedBox(width: 4),
+                      IconButton(
+                        icon: const Icon(Icons.emoji_emotions_outlined),
+                        color: _showEmojiPicker ? limeGreen : greyColor,
+                        onPressed: () {
+                          setState(() {
+                            _showEmojiPicker = !_showEmojiPicker;
+                          });
+                          if (_showEmojiPicker) {
+                            _editorFocusNode.unfocus();
+                          }
+                        },
+                        tooltip: 'Эмодзи',
+                      ),
+                      const SizedBox(width: 4),
+                      Container(
+                        width: 1,
+                        height: 24,
+                        color: dividerColor,
+                      ),
+                      const SizedBox(width: 4),
                       quill.QuillToolbarClearFormatButton(
                         controller: _quillController,
                         options: const quill.QuillToolbarClearFormatButtonOptions(
@@ -273,6 +296,44 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   scrollController: ScrollController(),
                 ),
               ),
+              if (_showEmojiPicker)
+                Container(
+                  height: 300,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: dividerColor),
+                  ),
+                  child: EmojiPicker(
+                    onEmojiSelected: (category, emoji) {
+                      // Вставляем эмодзи в текущую позицию курсора
+                      final selection = _quillController.selection;
+                      final index = selection.baseOffset;
+                      final length = selection.extentOffset - index;
+                      
+                      // Создаем новый Delta для вставки эмодзи
+                      final insertDelta = delta.Delta()
+                        ..retain(index)
+                        ..delete(length)
+                        ..insert(emoji.emoji);
+                      
+                      // Применяем изменения к документу
+                      _quillController.document.compose(insertDelta, quill.ChangeSource.local);
+                      
+                      // Обновляем позицию курсора после вставки
+                      final newOffset = index + emoji.emoji.length;
+                      _quillController.updateSelection(
+                        TextSelection.collapsed(offset: newOffset),
+                        quill.ChangeSource.local,
+                      );
+                    },
+                    config: const Config(
+                      height: 300,
+                      checkPlatformCompatibility: true,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 20),
               TextFormField(
                 controller: _imageUrlController,

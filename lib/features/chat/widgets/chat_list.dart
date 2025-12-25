@@ -86,7 +86,6 @@ class _ChatListState extends ConsumerState<ChatList> {
                 message: messageData.text,
                 date: timeSent,
                 type: messageData.type,
-                isSeen: messageData.isSeen,
               );
             }
             

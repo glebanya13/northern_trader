@@ -39,11 +39,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   double _getChildAspectRatio(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     if (width > 1200) {
-      return 0.75;
+      return 1.0;
     } else if (width > 600) {
-      return 0.8;
+      return 1.05;
     } else {
-      return 1.1;
+      return 1.2;
     }
   }
 
@@ -107,15 +107,15 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               _buildHeader(context),
               SliverPadding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width > 600 ? 24 : 16,
-                  vertical: 16,
+                  horizontal: MediaQuery.of(context).size.width > 600 ? 20 : 12,
+                  vertical: 12,
                 ),
                 sliver: SliverGrid(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: _getCrossAxisCount(context),
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.65,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: _getChildAspectRatio(context),
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
@@ -167,8 +167,8 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline,
-                        color: Colors.red, size: 48),
+                    Icon(Icons.error_outline,
+                        color: limeGreen.withOpacity(0.6), size: 48),
                     const SizedBox(height: 16),
                     Text(
                       'Ошибка: $error',
@@ -232,11 +232,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   Widget _buildSearchBar(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: dividerColor.withOpacity(0.3),
-          width: 1,
+          color: limeGreen.withOpacity(0.3),
+          width: 1.5,
         ),
       ),
       child: TextField(
@@ -248,11 +248,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
         },
         decoration: InputDecoration(
           hintText: 'Поиск',
-          hintStyle: TextStyle(color: greyColor),
-          prefixIcon: Icon(Icons.search, color: greyColor),
+          hintStyle: TextStyle(color: textColorSecondary),
+          prefixIcon: Icon(Icons.search, color: limeGreen),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
-                  icon: Icon(Icons.clear, color: greyColor),
+                  icon: Icon(Icons.clear, color: limeGreen),
                   onPressed: () {
                     setState(() {
                       _searchController.clear();
@@ -267,7 +267,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             vertical: 12,
           ),
         ),
-        style: TextStyle(color: textColor),
+        style: const TextStyle(color: textColor),
       ),
     );
   }

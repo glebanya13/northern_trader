@@ -22,44 +22,73 @@ class MobileChatScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: appBarColor,
-        title: StreamBuilder<UserModel>(
-          stream: ref.read(authControllerProvider).userDataById(uid),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Loader();
-            }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name),
-                Text(
-                  snapshot.data?.isOnline == true ? 'online' : 'offline',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.normal,
-                    color: greyColor,
+    final userData = ref.watch(userDataAuthProvider);
+    final isOwner = userData.value?.isOwner ?? false;
+    
+    return WillPopScope(
+      onWillPop: () async {
+        if (isOwner) {
+          Navigator.pop(context);
+        }
+        return isOwner;
+      },
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        appBar: AppBar(
+          backgroundColor: appBarColor,
+          foregroundColor: textColor,
+          iconTheme: const IconThemeData(color: textColor),
+          automaticallyImplyLeading: isOwner,
+          leading: isOwner ? IconButton(
+            icon: const Icon(Icons.arrow_back, color: textColor),
+            onPressed: () => Navigator.pop(context),
+          ) : null,
+          title: StreamBuilder<UserModel>(
+            stream: ref.read(authControllerProvider).userDataById(uid),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Loader();
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isOwner ? 'Чат' : name,
+                    style: const TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-              ],
-            );
-          },
+                  if (!isOwner)
+                    Text(
+                      snapshot.data?.isOnline == true ? 'online' : 'offline',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.normal,
+                        color: greyColor,
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+          centerTitle: false,
         ),
-        centerTitle: false,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ChatList(
-              recieverUserId: uid,
-            ),
+        body: Container(
+          color: backgroundColor,
+          child: Column(
+            children: [
+              Expanded(
+                child: ChatList(
+                  recieverUserId: uid,
+                ),
+              ),
+              BottomChatField(
+                recieverUserId: uid,
+              ),
+            ],
           ),
-          BottomChatField(
-            recieverUserId: uid,
-          ),
-        ],
+        ),
       ),
     );
   }

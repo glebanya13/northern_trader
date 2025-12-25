@@ -216,6 +216,8 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
     return Scaffold(
       appBar: _currentIndex == 0
           ? null
+          : (_currentIndex == 2 && !isOwner)
+          ? null
           : AppBar(
               elevation: 0,
               backgroundColor: appBarColor,
@@ -228,27 +230,29 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              actions: [
-                userData.when(
-                  data: (user) {
-                    if (user == null) return const SizedBox.shrink();
-                    return IconButton(
-                      icon: CircleAvatar(
-                        radius: 18,
-                        backgroundImage: user.profilePic.isNotEmpty
-                            ? CachedNetworkImageProvider(user.profilePic)
-                            : null,
-                        child: user.profilePic.isEmpty
-                            ? const Icon(Icons.person, size: 20, color: Colors.grey)
-                            : null,
+              actions: _currentIndex == 1
+                  ? null
+                  : [
+                      userData.when(
+                        data: (user) {
+                          if (user == null) return const SizedBox.shrink();
+                          return IconButton(
+                            icon: CircleAvatar(
+                              radius: 18,
+                              backgroundImage: user.profilePic.isNotEmpty
+                                  ? CachedNetworkImageProvider(user.profilePic)
+                                  : null,
+                              child: user.profilePic.isEmpty
+                                  ? const Icon(Icons.person, size: 20, color: Colors.grey)
+                                  : null,
+                            ),
+                            onPressed: () => _showProfileMenu(context, user.name, user.profilePic),
+                          );
+                        },
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const SizedBox.shrink(),
                       ),
-                      onPressed: () => _showProfileMenu(context, user.name, user.profilePic),
-                    );
-                  },
-                  loading: () => const SizedBox.shrink(),
-                  error: (_, __) => const SizedBox.shrink(),
-                ),
-              ],
+                    ],
             ),
       body: IndexedStack(
         index: _currentIndex,

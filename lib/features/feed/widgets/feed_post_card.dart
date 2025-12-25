@@ -23,14 +23,23 @@ class FeedPostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: limeGreen.withOpacity(0.2),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
             spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: limeGreen.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 0),
           ),
         ],
       ),
@@ -38,19 +47,19 @@ class FeedPostCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: SizedBox(
-            height: 500,
+          borderRadius: BorderRadius.circular(16),
+          child: ClipRect(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
               if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
+                    top: Radius.circular(14),
                   ),
                   child: AspectRatio(
-                    aspectRatio: 16 / 9,
+                    aspectRatio: 2.0,
                     child: CachedNetworkImage(
                       imageUrl: post.imageUrl!,
                       width: double.infinity,
@@ -65,10 +74,10 @@ class FeedPostCard extends StatelessWidget {
                         ),
                       ),
                       errorWidget: (context, url, error) => Container(
-                        color: backgroundColor,
-                        child: Icon(
+                        color: cardColorLight,
+                        child: const Icon(
                           Icons.image_not_supported,
-                          size: 32,
+                          size: 48,
                           color: greyColor,
                         ),
                       ),
@@ -76,7 +85,7 @@ class FeedPostCard extends StatelessWidget {
                   ),
                 ),
               Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -85,26 +94,27 @@ class FeedPostCard extends StatelessWidget {
                       post.title,
                       style: const TextStyle(
                         color: textColor,
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        height: 1.3,
+                        height: 1.15,
+                        letterSpacing: -0.3,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 5),
                     if (_getContentPreview(post).isNotEmpty)
                       Text(
                         _getContentPreview(post),
                         style: const TextStyle(
-                          color: textColor,
-                          fontSize: 14,
-                          height: 1.5,
+                          color: textColorSecondary,
+                          fontSize: 15,
+                          height: 1.25,
                         ),
-                        maxLines: 4,
+                        maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 7),
                     Row(
                       children: [
                         Text(
@@ -112,6 +122,7 @@ class FeedPostCard extends StatelessWidget {
                           style: const TextStyle(
                             color: greyColor,
                             fontSize: 12,
+                            height: 1.0,
                           ),
                         ),
                         const Spacer(),
@@ -120,11 +131,12 @@ class FeedPostCard extends StatelessWidget {
                           style: const TextStyle(
                             color: greyColor,
                             fontSize: 12,
+                            height: 1.0,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 3),
                     Row(
                       children: [
                         Icon(
@@ -138,6 +150,7 @@ class FeedPostCard extends StatelessWidget {
                           style: TextStyle(
                             color: greyColor,
                             fontSize: 12,
+                            height: 1.0,
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -152,6 +165,7 @@ class FeedPostCard extends StatelessWidget {
                           style: TextStyle(
                             color: greyColor,
                             fontSize: 12,
+                            height: 1.0,
                           ),
                         ),
                       ],

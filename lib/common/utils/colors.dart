@@ -1,32 +1,50 @@
 import 'package:flutter/material.dart';
 
-const backgroundColor = Color.fromRGBO(235, 235, 235, 1);
-const appBarColor = Color.fromRGBO(235, 235, 235, 1);
-const webAppBarColor = Color.fromRGBO(235, 235, 235, 1);
+// ═══════════════════════════════════════════════════════════
+// 🎨 ОСНОВНАЯ ПАЛИТРА - Темная тема с салатовым акцентом
+// ═══════════════════════════════════════════════════════════
 
-const textColor = Color.fromRGBO(0, 0, 0, 1);
-const textColorSecondary = Color.fromRGBO(100, 100, 100, 1);
-const greyColor = Color.fromRGBO(120, 120, 120, 1);
+// Основные фоновые цвета
+const backgroundColor = Color.fromRGBO(18, 18, 18, 1);           // Глубокий черный фон
+const appBarColor = Color.fromRGBO(24, 24, 24, 1);               // Чуть светлее для AppBar
+const webAppBarColor = Color.fromRGBO(24, 24, 24, 1);
 
-const limeGreen = Color.fromRGBO(206, 254, 95, 1);
-const limeGreenDark = Color.fromRGBO(180, 230, 80, 1);
-const goldAccent = Color.fromRGBO(255, 215, 0, 1);
-const lightBlue = Color.fromRGBO(135, 206, 250, 1);
+// Текстовые цвета
+const textColor = Color.fromRGBO(245, 245, 245, 1);              // Почти белый для читаемости
+const textColorSecondary = Color.fromRGBO(160, 160, 160, 1);     // Серый для второстепенного текста
+const greyColor = Color.fromRGBO(130, 130, 130, 1);              // Средний серый
 
-const cardColor = Color.fromRGBO(16, 16, 16, 1);
-const cardColorLight = Color.fromRGBO(30, 30, 30, 1);
-const whiteCardColor = Color.fromRGBO(255, 255, 255, 1);
-const whiteCardTextColor = Color.fromRGBO(0, 0, 0, 1);
-const whiteCardSecondaryTextColor = Color.fromRGBO(60, 60, 60, 1);
+// Салатовые акценты (главный цвет)
+const limeGreen = Color.fromRGBO(190, 255, 100, 1);              // Яркий салатовый
+const limeGreenDark = Color.fromRGBO(150, 220, 80, 1);           // Темнее для hover
+const limeGreenMuted = Color.fromRGBO(170, 235, 90, 1);          // Приглушенный для фона
 
-const messageColor = limeGreen;
-const senderMessageColor = cardColor;
-const tabColor = limeGreen;
-const searchBarColor = Color.fromRGBO(235, 235, 235, 1);
-const dividerColor = Color.fromRGBO(16, 16, 16, 1);
-const inputFieldColor = Color.fromRGBO(235, 235, 235, 1);
-const chatBarMessage = Color.fromRGBO(40, 40, 40, 1);
-const mobileChatBoxColor = Color.fromRGBO(30, 30, 30, 1);
+// Дополнительные акценты
+const purpleAccent = Color.fromRGBO(160, 100, 255, 1);           // Фиолетовый для дополнительных акцентов
+const goldAccent = Color.fromRGBO(255, 215, 0, 1);               // Оставляем золотой
+const lightBlue = Color.fromRGBO(100, 200, 255, 1);              // Голубой акцент
 
-const blackColor = Colors.black;
+// Карточки и контейнеры
+const cardColor = Color.fromRGBO(28, 28, 28, 1);                 // Темно-серая карточка
+const cardColorLight = Color.fromRGBO(35, 35, 35, 1);            // Светлее для вложенных элементов
+const cardColorDark = Color.fromRGBO(22, 22, 22, 1);             // Темнее основного фона
+
+// Белые карточки (для контраста)
+const whiteCardColor = Color.fromRGBO(245, 245, 245, 1);         // Светло-серый вместо белого
+const whiteCardTextColor = Color.fromRGBO(18, 18, 18, 1);        // Темный текст на светлом
+const whiteCardSecondaryTextColor = Color.fromRGBO(80, 80, 80, 1);
+
+// Специфичные цвета элементов
+const messageColor = limeGreen;                                   // Салатовый для сообщений
+const senderMessageColor = cardColorLight;                        // Серая карточка для входящих
+const tabColor = limeGreen;                                       // Салатовые табы
+const searchBarColor = cardColor;                                 // Темная поисковая строка
+const dividerColor = Color.fromRGBO(45, 45, 45, 1);             // Серый разделитель
+const inputFieldColor = cardColor;                                // Темное поле ввода
+const chatBarMessage = cardColorLight;                            // Панель сообщений
+const mobileChatBoxColor = cardColor;                             // Контейнер чата
+
+// Утилитарные цвета
+const blackColor = Color.fromRGBO(12, 12, 12, 1);               // Глубокий черный
+const whiteColor = Color.fromRGBO(255, 255, 255, 1);            // Чистый белый для иконок
 
