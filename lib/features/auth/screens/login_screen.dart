@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
+import 'package:northern_trader/common/widgets/theme_toggle_button.dart';
 import 'package:northern_trader/common/utils/utils.dart';
 import 'package:northern_trader/common/widgets/custom_button.dart';
 import 'package:northern_trader/features/auth/controller/auth_controller.dart';
@@ -92,11 +94,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final size = MediaQuery.of(context).size;
     final isDesktop = size.width > 600;
     final maxWidth = isDesktop ? 400.0 : double.infinity;
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
 
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: backgroundColor,
+        backgroundColor: colors.backgroundColor,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: const ThemeToggleButton(),
+          ),
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -110,10 +121,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 children: [
                   Text(
                     _isSignUp ? 'Регистрация' : 'Вход',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: textColor,
+                      color: colors.textColor,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -122,29 +133,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextField(
                     controller: emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: textColor),
+                  style: TextStyle(color: colors.textColor),
                   decoration: InputDecoration(
                     hintText: 'Email',
-                    prefixIcon: const Icon(Icons.email, color: greyColor),
+                    prefixIcon: Icon(Icons.email, color: colors.greyColor),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16.0,
                       vertical: 16.0,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: cardColor, width: 1),
+                      borderSide: BorderSide(color: colors.cardColor, width: 1),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: cardColor, width: 1),
+                      borderSide: BorderSide(color: colors.cardColor, width: 1),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: cardColor, width: 1),
+                      borderSide: BorderSide(color: colors.accentColor, width: 2),
                     ),
-                    fillColor: inputFieldColor,
+                    fillColor: colors.inputFieldColor,
                     filled: true,
-                    hintStyle: TextStyle(color: greyColor),
+                    hintStyle: TextStyle(color: colors.greyColor),
                   ),
                   ),
                   const SizedBox(height: 16),
@@ -152,14 +163,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextField(
                   controller: passwordController,
                   obscureText: _obscurePassword,
-                  style: const TextStyle(color: textColor),
+                  style: TextStyle(color: colors.textColor),
                   decoration: InputDecoration(
                     hintText: 'Пароль',
-                    prefixIcon: const Icon(Icons.lock, color: greyColor),
+                    prefixIcon: Icon(Icons.lock, color: colors.greyColor),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                        color: greyColor,
+                        color: colors.greyColor,
                       ),
                       onPressed: () {
                         setState(() {
@@ -173,19 +184,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: cardColor, width: 1),
+                      borderSide: BorderSide(color: colors.cardColor, width: 1),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: cardColor, width: 1),
+                      borderSide: BorderSide(color: colors.cardColor, width: 1),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: cardColor, width: 1),
+                      borderSide: BorderSide(color: colors.accentColor, width: 2),
                     ),
-                    fillColor: inputFieldColor,
+                    fillColor: colors.inputFieldColor,
                     filled: true,
-                    hintStyle: TextStyle(color: greyColor),
+                    hintStyle: TextStyle(color: colors.greyColor),
                   ),
                   ),
                   
@@ -205,7 +216,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       _isSignUp
                           ? 'Уже есть аккаунт? Войти'
                           : 'Нет аккаунта? Зарегистрироваться',
-                      style: const TextStyle(color: textColor),
+                      style: TextStyle(color: colors.textColor),
                     ),
                   ),
                 ],

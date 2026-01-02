@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:northern_trader/common/enums/message_enum.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
 import 'package:northern_trader/common/widgets/loader.dart';
 import 'package:northern_trader/features/chat/controller/chat_controller.dart';
 import 'package:northern_trader/features/chat/repository/chat_repository.dart';
@@ -46,10 +47,14 @@ class _ChatListState extends ConsumerState<ChatList> {
         }
 
         if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+          final themeMode = ref.watch(themeProvider);
+          final isDark = themeMode == ThemeMode.dark;
+          final colors = AppColors(isDark);
+          
           return Center(
             child: Text(
               'Нет сообщений. Начните общение!',
-              style: const TextStyle(color: greyColor),
+              style: TextStyle(color: colors.greyColor),
             ),
           );
         }
@@ -63,7 +68,7 @@ class _ChatListState extends ConsumerState<ChatList> {
         return ListView.builder(
           controller: messageController,
           itemCount: snapshot.data!.length,
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           itemBuilder: (context, index) {
             final messageData = snapshot.data![index];
             var timeSent = DateFormat.Hm().format(messageData.timeSent);

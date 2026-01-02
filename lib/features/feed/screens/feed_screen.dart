@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
+import 'package:northern_trader/common/widgets/theme_toggle_button.dart';
 import 'package:northern_trader/common/widgets/loader.dart';
 import 'package:northern_trader/features/channels/controller/channels_controller.dart';
 import 'package:northern_trader/features/feed/controller/feed_controller.dart';
@@ -25,31 +27,12 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     super.dispose();
   }
 
-  int _getCrossAxisCount(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    if (width > 1200) {
-      return 3;
-    } else if (width > 600) {
-      return 2;
-    } else {
-      return 1;
-    }
-  }
-
-  double _getChildAspectRatio(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    if (width > 1200) {
-      return 1.0;
-    } else if (width > 600) {
-      return 1.05;
-    } else {
-      return 1.2;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final feedPostsAsync = ref.watch(feedPostsProvider);
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
 
     return feedPostsAsync.when(
       data: (feedPosts) {
@@ -70,7 +53,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
         if (filteredPosts.isEmpty) {
           return CustomScrollView(
             slivers: [
-              _buildHeader(context),
+              _buildHeader(context, colors),
               SliverFillRemaining(
                 child: Center(
                   child: Column(
@@ -79,14 +62,14 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                       Icon(
                         Icons.article,
                         size: 64,
-                        color: greyColor,
+                        color: colors.greyColor,
                       ),
                       const SizedBox(height: 16),
                       Text(
                         _searchQuery.isEmpty
                             ? 'Пока нет постов в ленте'
                             : 'По вашему запросу ничего не найдено',
-                        style: TextStyle(color: greyColor, fontSize: 16),
+                        style: TextStyle(color: colors.greyColor, fontSize: 16),
                       ),
                     ],
                   ),
@@ -101,47 +84,71 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             ref.invalidate(feedPostsProvider);
           },
           color: limeGreen,
-          backgroundColor: cardColor,
+          backgroundColor: colors.cardColor,
           child: CustomScrollView(
             slivers: [
-              _buildHeader(context),
-              SliverPadding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width > 600 ? 20 : 12,
-                  vertical: 12,
-                ),
-                sliver: SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: _getCrossAxisCount(context),
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: _getChildAspectRatio(context),
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final feedPost = filteredPosts[index];
-                      return FeedPostCard(
-                        post: feedPost.post,
-                        channel: feedPost.channel,
-                        onTap: () {
-                          ref
-                              .read(channelsControllerProvider)
-                              .incrementViews(
-                                feedPost.channel.id,
-                                feedPost.post.id,
+              _buildHeader(context, colors),
+              SliverToBoxAdapter(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1400),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width > 600 ? 24 : 16,
+                        vertical: 12,
+                      ),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Учитываем ограниченную ширину для расчета количества колонок
+                          final availableWidth = constraints.maxWidth;
+                          final crossAxisCount = availableWidth > 1200
+                              ? 3
+                              : availableWidth > 600
+                                  ? 2
+                                  : 1;
+                          final childAspectRatio = availableWidth > 1200
+                              ? 1.0
+                              : availableWidth > 600
+                                  ? 1.05
+                                  : 1.2;
+                          
+                          return GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: crossAxisCount,
+                              crossAxisSpacing: 8,
+                              mainAxisSpacing: 8,
+                              childAspectRatio: childAspectRatio,
+                            ),
+                            itemCount: filteredPosts.length,
+                            itemBuilder: (context, index) {
+                              final feedPost = filteredPosts[index];
+                              return FeedPostCard(
+                                post: feedPost.post,
+                                channel: feedPost.channel,
+                                onTap: () {
+                                  ref
+                                      .read(channelsControllerProvider)
+                                      .incrementViews(
+                                        feedPost.channel.id,
+                                        feedPost.post.id,
+                                      );
+                                  Navigator.pushNamed(
+                                    context,
+                                    PostDetailScreen.routeName,
+                                    arguments: {
+                                      'post': feedPost.post,
+                                      'channel': feedPost.channel,
+                                    },
+                                  );
+                                },
                               );
-                          Navigator.pushNamed(
-                            context,
-                            PostDetailScreen.routeName,
-                            arguments: {
-                              'post': feedPost.post,
-                              'channel': feedPost.channel,
                             },
                           );
                         },
-                      );
-                    },
-                    childCount: filteredPosts.length,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -149,43 +156,53 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           ),
         );
       },
-      loading: () => CustomScrollView(
-        slivers: [
-          _buildHeader(context),
-          const SliverFillRemaining(
-            child: Loader(),
-          ),
-        ],
-      ),
-      error: (error, stackTrace) => CustomScrollView(
-        slivers: [
-          _buildHeader(context),
-          SliverFillRemaining(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline,
-                        color: limeGreen.withOpacity(0.6), size: 48),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Ошибка: $error',
-                      style: const TextStyle(color: greyColor),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+      loading: () {
+        final themeMode = ref.watch(themeProvider);
+        final isDark = themeMode == ThemeMode.dark;
+        final colors = AppColors(isDark);
+        return CustomScrollView(
+          slivers: [
+            _buildHeader(context, colors),
+            const SliverFillRemaining(
+              child: Loader(),
+            ),
+          ],
+        );
+      },
+      error: (error, stackTrace) {
+        final themeMode = ref.watch(themeProvider);
+        final isDark = themeMode == ThemeMode.dark;
+        final colors = AppColors(isDark);
+        return CustomScrollView(
+          slivers: [
+            _buildHeader(context, colors),
+            SliverFillRemaining(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error_outline,
+                          color: limeGreen.withOpacity(0.6), size: 48),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Ошибка: $error',
+                        style: TextStyle(color: colors.greyColor),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, AppColors colors) {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     return SliverToBoxAdapter(
@@ -194,81 +211,145 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           horizontal: isMobile ? 16 : 24,
           vertical: 20,
         ),
-        color: backgroundColor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    'Анализ рынков и обучающие материалы по торговле',
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: isMobile ? 20 : 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+        color: colors.backgroundColor,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1400),
+            child: isMobile
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Анализ рынков и обучающие материалы по торговле',
+                        style: TextStyle(
+                          color: colors.textColor,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildSearchBar(context, colors),
+                    ],
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Анализ рынков и обучающие материалы по торговле',
+                          style: TextStyle(
+                            color: colors.textColor,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      SizedBox(
+                        width: 400,
+                        child: _buildSearchBar(context, colors),
+                      ),
+                    ],
                   ),
-                ),
-                if (!isMobile) const SizedBox(width: 24),
-                if (!isMobile)
-                  SizedBox(
-                    width: 300,
-                    child: _buildSearchBar(context),
-                  ),
-              ],
-            ),
-            if (isMobile) ...[
-              const SizedBox(height: 16),
-              _buildSearchBar(context),
-            ],
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildSearchBar(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: limeGreen.withOpacity(0.3),
-          width: 1.5,
+  Widget _buildSearchBar(BuildContext context, AppColors colors) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      clipBehavior: Clip.hardEdge,
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: colors.searchBarColor,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: colors.accentColor.withOpacity(0.4),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: colors.accentColor.withOpacity(0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-      ),
-      child: TextField(
-        controller: _searchController,
-        onChanged: (value) {
-          setState(() {
-            _searchQuery = value;
-          });
-        },
-        decoration: InputDecoration(
-          hintText: 'Поиск',
-          hintStyle: TextStyle(color: textColorSecondary),
-          prefixIcon: Icon(Icons.search, color: limeGreen),
-          suffixIcon: _searchQuery.isNotEmpty
-              ? IconButton(
-                  icon: Icon(Icons.clear, color: limeGreen),
-                  onPressed: () {
-                    setState(() {
-                      _searchController.clear();
-                      _searchQuery = '';
-                    });
-                  },
-                )
-              : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
+        child: Material(
+          color: Colors.transparent,
+          child: TextField(
+          controller: _searchController,
+          onChanged: (value) {
+            setState(() {
+              _searchQuery = value;
+            });
+          },
+          maxLines: 1,
+          textAlignVertical: TextAlignVertical.center,
+          decoration: InputDecoration(
+            hintText: 'Поиск',
+            hintStyle: TextStyle(
+              color: colors.textColorSecondary,
+              fontSize: 15,
+            ),
+            prefixIcon: Icon(
+              Icons.search,
+              color: colors.accentColor,
+              size: 22,
+            ),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 48,
+              minHeight: 48,
+            ),
+            suffixIcon: _searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      color: colors.accentColor,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _searchController.clear();
+                        _searchQuery = '';
+                      });
+                    },
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 40,
+                      minHeight: 40,
+                    ),
+                    iconSize: 20,
+                  )
+                : null,
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 14,
+            ),
+            isDense: false,
+            filled: false,
+          ),
+          style: TextStyle(
+            color: colors.textColor,
+            fontSize: 15,
+            height: 1.2,
           ),
         ),
-        style: const TextStyle(color: textColor),
       ),
+    ),
     );
   }
 }

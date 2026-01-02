@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
 import 'package:northern_trader/common/enums/message_enum.dart';
 import 'package:northern_trader/features/chat/widgets/display_text_image_gif.dart';
 
-class SenderMessageCard extends StatelessWidget {
+class SenderMessageCard extends ConsumerWidget {
   final String message;
   final String date;
   final MessageEnum type;
@@ -16,7 +18,11 @@ class SenderMessageCard extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
+    
     return Align(
       alignment: Alignment.centerLeft,
       child: ConstrainedBox(
@@ -24,9 +30,9 @@ class SenderMessageCard extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width - 60,
         ),
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
-            color: cardColor,
+            color: isDark ? colors.cardColor : cardColorLightLight,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
@@ -34,12 +40,14 @@ class SenderMessageCard extends StatelessWidget {
               bottomRight: Radius.circular(20),
             ),
             border: Border.all(
-              color: greyColor.withOpacity(0.3),
+              color: colors.greyColor.withOpacity(0.3),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: isDark 
+                  ? Colors.black.withOpacity(0.3)
+                  : Colors.black.withOpacity(0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -52,16 +60,16 @@ class SenderMessageCard extends StatelessWidget {
               Padding(
                 padding: type == MessageEnum.text
                     ? const EdgeInsets.only(
-                        left: 14,
-                        right: 14,
-                        top: 16,
-                        bottom: 8,
+                        left: 12,
+                        right: 12,
+                        top: 10,
+                        bottom: 4,
                       )
                     : const EdgeInsets.only(
-                        left: 8,
-                        top: 8,
-                        right: 8,
-                        bottom: 8,
+                        left: 6,
+                        top: 6,
+                        right: 6,
+                        bottom: 6,
                       ),
                 child: DisplayTextImageGIF(
                   message: message,
@@ -70,15 +78,15 @@ class SenderMessageCard extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(
-                  left: 14,
-                  right: 14,
-                  bottom: 8,
+                  left: 12,
+                  right: 12,
+                  bottom: 6,
                 ),
                 child: Text(
                   date,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: textColorSecondary,
+                    color: colors.textColorSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

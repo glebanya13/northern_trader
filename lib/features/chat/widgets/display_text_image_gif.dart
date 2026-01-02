@@ -1,10 +1,12 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:northern_trader/common/enums/message_enum.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
 
-class DisplayTextImageGIF extends StatelessWidget {
+class DisplayTextImageGIF extends ConsumerWidget {
   final String message;
   final MessageEnum type;
   const DisplayTextImageGIF({
@@ -14,18 +16,21 @@ class DisplayTextImageGIF extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     bool isPlaying = false;
     final AudioPlayer audioPlayer = AudioPlayer();
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
 
     return type == MessageEnum.text
         ? Container(
             constraints: const BoxConstraints(),
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
-                color: textColor,
+                color: colors.textColor,
                 height: 1.2,
               ),
             ),
@@ -51,7 +56,7 @@ class DisplayTextImageGIF extends StatelessWidget {
                   },
                   icon: Icon(
                     isPlaying ? Icons.pause_circle : Icons.play_circle,
-                    color: limeGreen,
+                    color: colors.accentColor,
                   ),
                 );
               })
@@ -69,20 +74,20 @@ class DisplayTextImageGIF extends StatelessWidget {
                         ? Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: cardColorDark,
+                              color: colors.cardColorDark,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: limeGreen.withOpacity(0.3),
+                                color: colors.accentColor.withOpacity(0.3),
                                 width: 1,
                               ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.insert_drive_file,
                                   size: 32,
-                                  color: limeGreen,
+                                  color: colors.accentColor,
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
@@ -90,20 +95,20 @@ class DisplayTextImageGIF extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Text(
+                                      Text(
                                         'Файл',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 14,
-                                          color: textColor,
+                                          color: colors.textColor,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
                                         message,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 12,
-                                          color: textColorSecondary,
+                                          color: colors.textColorSecondary,
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,

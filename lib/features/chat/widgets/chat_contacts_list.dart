@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
 import 'package:northern_trader/common/widgets/loader.dart';
 import 'package:northern_trader/features/auth/controller/auth_controller.dart';
 import 'package:northern_trader/features/chat/controller/chat_controller.dart';
@@ -39,12 +40,18 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
   @override
   Widget build(BuildContext context) {
     final userData = ref.watch(userDataAuthProvider);
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
     
     return userData.when(
       data: (user) {
         if (user == null) {
-          return const Center(
-            child: Text('Пожалуйста, войдите в систему'),
+          return Center(
+            child: Text(
+              'Пожалуйста, войдите в систему',
+              style: TextStyle(color: colors.textColor),
+            ),
           );
         }
 
@@ -62,11 +69,11 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.error_outline, color: limeGreen.withOpacity(0.6), size: 48),
+                        Icon(Icons.error_outline, color: colors.accentColor.withOpacity(0.6), size: 48),
                         const SizedBox(height: 16),
                         Text(
                           'Ошибка: ${snapshot.error}',
-                          style: const TextStyle(color: greyColor),
+                          style: TextStyle(color: colors.greyColor),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -75,15 +82,15 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                 );
               }
               if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
-                return const Center(
+                return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.chat_bubble_outline, size: 64, color: greyColor),
-                      SizedBox(height: 16),
+                      Icon(Icons.chat_bubble_outline, size: 64, color: colors.greyColor),
+                      const SizedBox(height: 16),
                       Text(
                         'Нет чатов с пользователями',
-                        style: TextStyle(color: greyColor, fontSize: 16),
+                        style: TextStyle(color: colors.greyColor, fontSize: 16),
                       ),
                     ],
                   ),
@@ -99,20 +106,22 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                      color: cardColor,
+                      color: isDark ? colors.cardColor : cardColorLightLight,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: limeGreen.withOpacity(0.4),
+                        color: colors.accentColor.withOpacity(isDark ? 0.4 : 0.5),
                         width: 2,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: isDark 
+                            ? Colors.black.withOpacity(0.3)
+                            : Colors.black.withOpacity(0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 3),
                         ),
                         BoxShadow(
-                          color: limeGreen.withOpacity(0.15),
+                          color: colors.accentColor.withOpacity(isDark ? 0.15 : 0.2),
                           blurRadius: 20,
                           offset: const Offset(0, 0),
                         ),
@@ -142,12 +151,12 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: limeGreen.withOpacity(0.5),
+                                    color: colors.accentColor.withOpacity(0.5),
                                     width: 2.5,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: limeGreen.withOpacity(0.2),
+                                      color: colors.accentColor.withOpacity(0.2),
                                       blurRadius: 8,
                                       offset: const Offset(0, 2),
                                     ),
@@ -163,11 +172,11 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                                       ? Container(
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
-                                            color: limeGreen.withOpacity(0.15),
+                                            color: colors.accentColor.withOpacity(0.15),
                                           ),
                                           child: Icon(
                                             Icons.person_rounded,
-                                            color: limeGreen.withOpacity(0.8),
+                                            color: colors.accentColor.withOpacity(0.8),
                                             size: 32,
                                           ),
                                         )
@@ -181,9 +190,9 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                                   children: [
                                     Text(
                                       chatContactData.name,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 17,
-                                        color: textColor,
+                                        color: colors.textColor,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.3,
                                       ),
@@ -193,9 +202,9 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                                     const SizedBox(height: 6),
                                     Text(
                                       chatContactData.lastMessage,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 14,
-                                        color: greyColor,
+                                        color: colors.greyColor,
                                         letterSpacing: 0.2,
                                       ),
                                       maxLines: 1,
@@ -214,22 +223,22 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
                                       vertical: 6,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: limeGreen.withOpacity(0.15),
+                                      color: colors.accentColor.withOpacity(0.15),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Text(
                                       DateFormat.Hm().format(chatContactData.timeSent),
-                                      style: const TextStyle(
-                                        color: limeGreen,
+                                      style: TextStyle(
+                                        color: colors.accentColor,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                  const Icon(
+                                  Icon(
                                     Icons.arrow_forward_ios_rounded,
-                                    color: greyColor,
+                                    color: colors.greyColor,
                                     size: 16,
                                   ),
                                 ],
@@ -251,15 +260,15 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
         }
 
         if (ownerId == null || ownerId!.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 64, color: greyColor),
-                SizedBox(height: 16),
+                Icon(Icons.error_outline, size: 64, color: colors.greyColor),
+                const SizedBox(height: 16),
                 Text(
                   'Владелец не найден',
-                  style: TextStyle(color: greyColor, fontSize: 16),
+                  style: TextStyle(color: colors.greyColor, fontSize: 16),
                 ),
               ],
             ),
@@ -273,10 +282,10 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
               return const Loader();
             }
             if (snapshot.hasError || !snapshot.hasData) {
-              return const Center(
+              return Center(
                 child: Text(
                   'Ошибка загрузки данных владельца',
-                  style: TextStyle(color: greyColor),
+                  style: TextStyle(color: colors.greyColor),
                 ),
               );
             }
@@ -291,23 +300,29 @@ class _ChatContactsListState extends ConsumerState<ChatContactsList> {
         );
       },
       loading: () => const Loader(),
-      error: (error, stack) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, color: limeGreen.withOpacity(0.6), size: 48),
-              const SizedBox(height: 16),
-              Text(
-                'Ошибка: $error',
-                style: const TextStyle(color: greyColor),
-                textAlign: TextAlign.center,
-              ),
-            ],
+      error: (error, stack) {
+        final themeMode = ref.read(themeProvider);
+        final isDark = themeMode == ThemeMode.dark;
+        final colors = AppColors(isDark);
+        
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, color: colors.accentColor.withOpacity(0.6), size: 48),
+                const SizedBox(height: 16),
+                Text(
+                  'Ошибка: $error',
+                  style: TextStyle(color: colors.greyColor),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

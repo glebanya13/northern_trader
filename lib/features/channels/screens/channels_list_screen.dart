@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
 import 'package:northern_trader/common/utils/utils.dart';
 import 'package:northern_trader/common/widgets/loader.dart';
 import 'package:northern_trader/features/auth/controller/auth_controller.dart';
@@ -262,10 +263,14 @@ class _ChannelCard extends ConsumerWidget {
   }
 
   void _deleteChannel(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.read(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: cardColor,
+        backgroundColor: colors.cardColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
@@ -288,11 +293,11 @@ class _ChannelCard extends ConsumerWidget {
               child: Icon(Icons.warning_amber_rounded, color: Colors.red[400], size: 24),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Text(
                 'Удалить канал?',
                 style: TextStyle(
-                  color: textColor,
+                  color: colors.textColor,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -300,10 +305,10 @@ class _ChannelCard extends ConsumerWidget {
             ),
           ],
         ),
-        content: const Text(
+        content: Text(
           'Вы уверены, что хотите удалить этот канал? Это действие нельзя отменить. Канал можно удалить только если в нем нет постов.',
           style: TextStyle(
-            color: textColorSecondary,
+            color: colors.textColorSecondary,
             fontSize: 15,
             height: 1.5,
           ),
@@ -314,10 +319,10 @@ class _ChannelCard extends ConsumerWidget {
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            child: const Text(
+            child: Text(
               'Отмена',
               style: TextStyle(
-                color: textColorSecondary,
+                color: colors.textColorSecondary,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -365,25 +370,32 @@ class _ChannelCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userData = ref.watch(userDataAuthProvider);
     final isOwner = userData.value?.isOwner ?? false;
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
     
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
+        color: colors.cardColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: limeGreen.withOpacity(0.35),
+          color: colors.accentColor.withOpacity(isDark ? 0.35 : 0.5),
           width: isMobile ? 2.5 : 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: isMobile ? 12 : 10,
-            offset: const Offset(0, 4),
+            color: isDark 
+              ? Colors.black.withOpacity(0.4)
+              : Colors.black.withOpacity(0.1),
+            blurRadius: isMobile ? 8 : 6,
+            offset: const Offset(0, 2),
+            spreadRadius: 0,
           ),
           BoxShadow(
-            color: limeGreen.withOpacity(0.12),
-            blurRadius: isMobile ? 24 : 20,
+            color: colors.accentColor.withOpacity(isDark ? 0.08 : 0.12),
+            blurRadius: isMobile ? 16 : 12,
             offset: const Offset(0, 0),
+            spreadRadius: -2,
           ),
         ],
       ),
@@ -413,7 +425,7 @@ class _ChannelCard extends ConsumerWidget {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: cardColorDark,
+                    color: colors.cardColorDark,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(17),
                       topRight: Radius.circular(17),
@@ -432,7 +444,7 @@ class _ChannelCard extends ConsumerWidget {
                             height: double.infinity,
                             placeholder: (context, url) => Center(
                               child: CircularProgressIndicator(
-                                color: limeGreen,
+                                color: colors.accentColor,
                                 strokeWidth: 3,
                               ),
                             ),
@@ -440,7 +452,7 @@ class _ChannelCard extends ConsumerWidget {
                               child: Icon(
                                 Icons.rss_feed_rounded,
                                 size: isMobile ? 80 : 64,
-                                color: greyColor.withOpacity(0.5),
+                                color: colors.greyColor.withOpacity(0.5),
                               ),
                             ),
                           )
@@ -448,7 +460,7 @@ class _ChannelCard extends ConsumerWidget {
                             child: Icon(
                               Icons.rss_feed_rounded,
                               size: isMobile ? 80 : 64,
-                              color: greyColor.withOpacity(0.5),
+                              color: colors.greyColor.withOpacity(0.5),
                             ),
                           ),
                   ),
@@ -464,8 +476,8 @@ class _ChannelCard extends ConsumerWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      cardColorLight,
-                      cardColorDark,
+                      colors.cardColorLight,
+                      colors.cardColorDark,
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
@@ -479,7 +491,7 @@ class _ChannelCard extends ConsumerWidget {
                     Text(
                       channel.name,
                       style: TextStyle(
-                        color: textColor,
+                        color: isDark ? colors.textColor : textColorDark,
                         fontSize: isMobile ? 18 : 17,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.3,
@@ -491,7 +503,7 @@ class _ChannelCard extends ConsumerWidget {
                     Text(
                       channel.description,
                       style: TextStyle(
-                        color: textColorSecondary,
+                        color: isDark ? colors.textColorSecondary : textColorSecondaryDark,
                         fontSize: isMobile ? 14 : 13,
                         height: 1.4,
                         letterSpacing: 0.1,
@@ -520,8 +532,8 @@ class _ChannelCard extends ConsumerWidget {
                               );
                             },
                             icon: Icons.edit_outlined,
-                            iconColor: limeGreen,
-                            backgroundColor: limeGreen.withOpacity(0.2),
+                            iconColor: colors.accentColor,
+                            backgroundColor: colors.accentColor.withOpacity(0.2),
                             isMobile: isMobile,
                           ),
                           SizedBox(width: isMobile ? 8 : 6),

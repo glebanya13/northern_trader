@@ -10,24 +10,27 @@ import 'package:northern_trader/common/utils/utils.dart';
 import 'package:northern_trader/common/widgets/theme_toggle_button.dart';
 import 'package:northern_trader/features/channels/controller/channels_controller.dart';
 import 'package:northern_trader/models/channel.dart';
+import 'package:northern_trader/models/channel_post.dart';
 
-class CreatePostScreen extends ConsumerStatefulWidget {
+class EditPostScreen extends ConsumerStatefulWidget {
   final Channel channel;
+  final ChannelPost post;
   
-  const CreatePostScreen({
+  const EditPostScreen({
     Key? key,
     required this.channel,
+    required this.post,
   }) : super(key: key);
 
   @override
-  ConsumerState<CreatePostScreen> createState() => _CreatePostScreenState();
+  ConsumerState<EditPostScreen> createState() => _EditPostScreenState();
 }
 
-class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
+class _EditPostScreenState extends ConsumerState<EditPostScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
+  late final TextEditingController _titleController;
   late final quill.QuillController _quillController;
-  final _imageUrlController = TextEditingController();
+  late final TextEditingController _imageUrlController;
   bool _isLoading = false;
   bool _showEmojiPicker = false;
   final FocusNode _editorFocusNode = FocusNode();
@@ -35,7 +38,40 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   @override
   void initState() {
     super.initState();
-    _quillController = quill.QuillController.basic();
+    _titleController = TextEditingController(text: widget.post.title);
+    _imageUrlController = TextEditingController(text: widget.post.imageUrl ?? '');
+    
+    // Инициализируем Quill контроллер с существующим контентом
+    if (widget.post.contentType == 'quill') {
+      try {
+        final deltaJson = jsonDecode(widget.post.content) as List;
+        final document = quill.Document.fromJson(deltaJson);
+        _quillController = quill.QuillController(
+          document: document,
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      } catch (e) {
+        // Если ошибка при загрузке, создаем документ с текстом
+        _quillController = quill.QuillController.basic();
+        final text = widget.post.content;
+        if (text.isNotEmpty) {
+          _quillController.document.compose(
+            delta.Delta()..insert(text),
+            quill.ChangeSource.local,
+          );
+        }
+      }
+    } else {
+      // Для markdown создаем документ с текстом
+      _quillController = quill.QuillController.basic();
+      final text = widget.post.content;
+      if (text.isNotEmpty) {
+        _quillController.document.compose(
+          delta.Delta()..insert(text),
+          quill.ChangeSource.local,
+        );
+      }
+    }
   }
 
   @override
@@ -47,7 +83,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     super.dispose();
   }
 
-  Future<void> _createPost() async {
+  Future<void> _updatePost() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -58,8 +94,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       return;
     }
 
-    if (widget.channel.id.isEmpty) {
-      showSnackBar(context: context, content: 'Ошибка: ID канала пустой');
+    if (widget.channel.id.isEmpty || widget.post.id.isEmpty) {
+      showSnackBar(context: context, content: 'Ошибка: ID канала или поста пустой');
       return;
     }
 
@@ -70,25 +106,22 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     try {
       final deltaJson = jsonEncode(_quillController.document.toDelta().toJson());
       
-      await ref.read(channelsControllerProvider).createPost(
+      await ref.read(channelsControllerProvider).updatePost(
         widget.channel.id,
+        widget.post.id,
         {
-          'channelId': widget.channel.id,
           'title': _titleController.text.trim(),
           'content': deltaJson,
-          'contentType': 'quill', // Указываем тип контента
+          'contentType': 'quill',
           'imageUrl': _imageUrlController.text.trim().isEmpty 
               ? null 
               : _imageUrlController.text.trim(),
-          'videoUrl': null,
-          'createdAt': DateTime.now().millisecondsSinceEpoch,
-          'views': 0,
         },
       );
       
       if (mounted) {
         Navigator.pop(context);
-        showSnackBar(context: context, content: 'Пост создан');
+        showSnackBar(context: context, content: 'Пост обновлен');
       }
     } catch (e) {
       if (mounted) {
@@ -114,7 +147,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         backgroundColor: colors.appBarColor,
         elevation: 0,
         title: Text(
-          'Создать пост',
+          'Редактировать пост',
           style: TextStyle(color: colors.textColor, fontWeight: FontWeight.bold),
         ),
         iconTheme: IconThemeData(color: colors.textColor),
@@ -133,7 +166,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               Text(
                 'Канал: ${widget.channel.name}',
                 style: TextStyle(
@@ -141,7 +174,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   fontSize: 14,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: _titleController,
                 style: TextStyle(color: colors.textColor),
@@ -150,15 +183,15 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   labelStyle: TextStyle(color: colors.greyColor),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: colors.dividerColor),
+                    borderSide: BorderSide(color: colors.dividerColor, width: 1.5),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: colors.dividerColor),
+                    borderSide: BorderSide(color: colors.dividerColor, width: 1.5),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: colors.accentColor, width: 2),
+                    borderSide: BorderSide(color: colors.accentColor, width: 2.5),
                   ),
                   fillColor: colors.inputColor,
                   filled: true,
@@ -170,7 +203,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               Text(
                 'Содержание',
                 style: TextStyle(
@@ -179,15 +212,15 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Container(
                 decoration: BoxDecoration(
                   color: colors.inputColor,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                   border: Border(
-                    top: BorderSide(color: colors.dividerColor),
-                    left: BorderSide(color: colors.dividerColor),
-                    right: BorderSide(color: colors.dividerColor),
+                    top: BorderSide(color: colors.dividerColor, width: 1.5),
+                    left: BorderSide(color: colors.dividerColor, width: 1.5),
+                    right: BorderSide(color: colors.dividerColor, width: 1.5),
                   ),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -299,7 +332,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 decoration: BoxDecoration(
                   color: colors.inputColor,
                   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
-                  border: Border.all(color: colors.dividerColor),
+                  border: Border.all(color: colors.dividerColor, width: 1.5),
                 ),
                 padding: const EdgeInsets.all(16),
                 child: Theme(
@@ -324,25 +357,21 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   decoration: BoxDecoration(
                     color: colors.inputColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: colors.dividerColor),
+                    border: Border.all(color: colors.dividerColor, width: 1.5),
                   ),
                   child: EmojiPicker(
                     onEmojiSelected: (category, emoji) {
-                      // Вставляем эмодзи в текущую позицию курсора
                       final selection = _quillController.selection;
                       final index = selection.baseOffset;
                       final length = selection.extentOffset - index;
                       
-                      // Создаем новый Delta для вставки эмодзи
                       final insertDelta = delta.Delta()
                         ..retain(index)
                         ..delete(length)
                         ..insert(emoji.emoji);
                       
-                      // Применяем изменения к документу
                       _quillController.document.compose(insertDelta, quill.ChangeSource.local);
                       
-                      // Обновляем позицию курсора после вставки
                       final newOffset = index + emoji.emoji.length;
                       _quillController.updateSelection(
                         TextSelection.collapsed(offset: newOffset),
@@ -352,10 +381,10 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                     config: const Config(
                       height: 300,
                       checkPlatformCompatibility: true,
-                    ),
                   ),
                 ),
-              const SizedBox(height: 20),
+              ),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: _imageUrlController,
                 style: TextStyle(color: colors.textColor),
@@ -364,23 +393,23 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   labelStyle: TextStyle(color: colors.greyColor),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: colors.dividerColor),
+                    borderSide: BorderSide(color: colors.dividerColor, width: 1.5),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: colors.dividerColor),
+                    borderSide: BorderSide(color: colors.dividerColor, width: 1.5),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: colors.accentColor, width: 2),
+                    borderSide: BorderSide(color: colors.accentColor, width: 2.5),
                   ),
                   fillColor: colors.inputColor,
                   filled: true,
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _isLoading ? null : _createPost,
+                onPressed: _isLoading ? null : _updatePost,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colors.accentColor,
                   minimumSize: const Size(double.infinity, 50),
@@ -399,7 +428,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                         ),
                       )
                     : Text(
-                        'Создать пост',
+                        'Сохранить изменения',
                         style: TextStyle(
                           color: colors.isDark ? blackColor : whiteColor,
                           fontWeight: FontWeight.bold,

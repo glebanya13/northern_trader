@@ -7,20 +7,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:northern_trader/common/utils/colors.dart';
 import 'package:northern_trader/common/providers/theme_provider.dart';
-import 'package:northern_trader/common/widgets/theme_toggle_button.dart';
 import 'package:northern_trader/models/channel_post.dart';
 import 'package:northern_trader/models/channel.dart';
+import 'package:northern_trader/features/channels/screens/edit_post_screen.dart';
+import 'package:northern_trader/features/channels/controller/channels_controller.dart';
+import 'package:northern_trader/common/utils/utils.dart';
 
-class PostDetailScreen extends ConsumerWidget {
+class ChannelPostDetailScreen extends ConsumerWidget {
   final ChannelPost post;
   final Channel channel;
+  final bool isOwner;
 
-  static const routeName = '/post-detail';
-
-  const PostDetailScreen({
+  const ChannelPostDetailScreen({
     Key? key,
     required this.post,
     required this.channel,
+    required this.isOwner,
   }) : super(key: key);
 
   @override
@@ -39,12 +41,36 @@ class PostDetailScreen extends ConsumerWidget {
           icon: Icon(Icons.arrow_back, color: colors.textColor),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: const ThemeToggleButton(),
-          ),
-        ],
+        title: Text(
+          channel.name,
+          style: TextStyle(color: colors.textColor),
+        ),
+        actions: isOwner
+            ? [
+                IconButton(
+                  icon: Icon(Icons.edit, color: colors.accentColor),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditPostScreen(
+                          channel: channel,
+                          post: post,
+                        ),
+                      ),
+                    );
+                  },
+                  tooltip: 'Редактировать',
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete_outline, color: Colors.red[400]),
+                  onPressed: () {
+                    ChannelPostDetailScreen._showDeleteDialog(context, ref, channel, post, colors);
+                  },
+                  tooltip: 'Удалить',
+                ),
+              ]
+            : null,
       ),
       body: Center(
         child: ConstrainedBox(
@@ -359,6 +385,82 @@ class PostDetailScreen extends ConsumerWidget {
         ),
       );
     }
+  }
+
+  static void _showDeleteDialog(BuildContext context, WidgetRef ref, Channel channel, ChannelPost post, AppColors colors) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: colors.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Удалить пост?',
+          style: TextStyle(
+            color: colors.textColor,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'Вы уверены, что хотите удалить этот пост? Это действие нельзя отменить.',
+          style: TextStyle(
+            color: colors.textColorSecondary,
+            fontSize: 15,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            child: Text(
+              'Отмена',
+              style: TextStyle(
+                color: colors.greyColor,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                await ref.read(channelsControllerProvider).deletePost(
+                  channel.id,
+                  post.id,
+                );
+                if (context.mounted) {
+                  Navigator.pop(context); // Закрываем диалог
+                  Navigator.pop(context); // Возвращаемся на предыдущий экран
+                  showSnackBar(context: context, content: 'Пост удален');
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  showSnackBar(context: context, content: 'Ошибка: ${e.toString()}');
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[400],
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              'Удалить',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

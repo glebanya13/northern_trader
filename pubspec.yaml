@@ -30,6 +30,7 @@ dependencies:
   flutter_html: ^3.0.0-beta.2
   flutter_markdown: ^0.7.4+1
   flutter_quill: ^11.5.0
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_test:

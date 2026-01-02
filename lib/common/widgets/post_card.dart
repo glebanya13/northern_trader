@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:intl/intl.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
 import 'package:northern_trader/models/channel_post.dart';
 import 'package:northern_trader/models/channel.dart';
 
@@ -26,6 +27,9 @@ class PostCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
     final double imageHeight = compact ? 140 : 200;
     final EdgeInsets contentPadding =
         compact ? const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 10.0) : const EdgeInsets.fromLTRB(14.0, 14.0, 14.0, 10.0);
@@ -41,24 +45,11 @@ class PostCard extends ConsumerWidget {
       margin: EdgeInsets.only(bottom: containerMarginBottom),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: cardColor,
+        color: colors.cardColor,
         border: Border.all(
-          color: limeGreen.withOpacity(0.25),
+          color: limeGreenLight.withOpacity(0.25),
           width: 1.5,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            color: limeGreen.withOpacity(0.1),
-            blurRadius: 16,
-            offset: const Offset(0, 0),
-          ),
-        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -84,14 +75,14 @@ class PostCard extends ConsumerWidget {
                             height: imageHeight,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [appBarColor, cardColor],
+                                colors: [colors.appBarColor, colors.cardColor],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
                             ),
                             child: Center(
                               child: CircularProgressIndicator(
-                                color: limeGreen,
+                                color: colors.accentColor,
                                 strokeWidth: 3,
                               ),
                             ),
@@ -100,15 +91,15 @@ class PostCard extends ConsumerWidget {
                             height: imageHeight,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [appBarColor, cardColor],
+                                colors: [colors.appBarColor, colors.cardColor],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.image_not_supported_outlined,
                               size: 56,
-                              color: greyColor,
+                              color: isDark ? colors.greyColor : greyColorDark,
                             ),
                           ),
                         ),
@@ -125,7 +116,7 @@ class PostCard extends ConsumerWidget {
                               end: Alignment.bottomCenter,
                               colors: [
                                 Colors.transparent,
-                                cardColor.withOpacity(0.7),
+                                colors.cardColor.withOpacity(0.7),
                               ],
                             ),
                           ),
@@ -148,14 +139,14 @@ class PostCard extends ConsumerWidget {
                                 shape: BoxShape.circle,
                                 gradient: LinearGradient(
                                   colors: [
-                                    limeGreen.withOpacity(0.3),
-                                    limeGreen.withOpacity(0.1),
+                                    colors.accentColor.withOpacity(0.3),
+                                    colors.accentColor.withOpacity(0.1),
                                   ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                 ),
                                 border: Border.all(
-                                  color: limeGreen.withOpacity(0.4),
+                                  color: colors.accentColor.withOpacity(0.4),
                                   width: 2,
                                 ),
                               ),
@@ -165,31 +156,31 @@ class PostCard extends ConsumerWidget {
                                         imageUrl: channel.imageUrl,
                                         fit: BoxFit.cover,
                                         placeholder: (context, url) => Container(
-                                          color: appBarColor,
+                                          color: colors.appBarColor,
                                         ),
                                         errorWidget: (context, url, error) => Container(
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
-                                              colors: [appBarColor, cardColor],
+                                              colors: [colors.appBarColor, colors.cardColor],
                                             ),
                                           ),
-                                          child: const Icon(
+                                          child: Icon(
                                             Icons.rss_feed_rounded,
                                             size: 20,
-                                            color: limeGreen,
+                                            color: colors.accentColor,
                                           ),
                                         ),
                                       )
                                     : Container(
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
-                                            colors: [appBarColor, cardColor],
+                                            colors: [colors.appBarColor, colors.cardColor],
                                           ),
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.rss_feed_rounded,
                                           size: 20,
-                                          color: limeGreen,
+                                          color: colors.accentColor,
                                         ),
                                       ),
                               ),
@@ -201,8 +192,8 @@ class PostCard extends ConsumerWidget {
                                 children: [
                                   Text(
                                     channel.name,
-                                    style: const TextStyle(
-                                      color: limeGreen,
+                                    style: TextStyle(
+                                      color: colors.accentColor,
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.3,
@@ -214,8 +205,8 @@ class PostCard extends ConsumerWidget {
                                   const SizedBox(height: 2),
                                   Text(
                                     DateFormat('dd.MM.yyyy HH:mm').format(post.createdAt),
-                                    style: const TextStyle(
-                                      color: greyColor,
+                                    style: TextStyle(
+                                      color: isDark ? colors.greyColor : greyColorDark,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                       height: 1.0,
@@ -231,7 +222,7 @@ class PostCard extends ConsumerWidget {
                       Text(
                         post.title,
                         style: TextStyle(
-                          color: textColor,
+                          color: isDark ? colors.textColor : textColorDark,
                           fontSize: titleFontSize,
                           fontWeight: FontWeight.bold,
                           height: compact ? 1.2 : 1.15,
@@ -243,6 +234,8 @@ class PostCard extends ConsumerWidget {
                       SizedBox(height: compact ? 5 : 5),
                       _buildPostPreview(
                         post,
+                        colors,
+                        isDark: isDark,
                         fontSize: previewFontSize,
                         maxLines: previewMaxLines,
                       ),
@@ -253,10 +246,10 @@ class PostCard extends ConsumerWidget {
                           vertical: metaVerticalPadding,
                         ),
                         decoration: BoxDecoration(
-                          color: cardColorLight,
+                          color: colors.cardColorLight,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: dividerColor.withOpacity(0.2),
+                            color: colors.dividerColor.withOpacity(0.2),
                             width: 1,
                           ),
                         ),
@@ -266,25 +259,25 @@ class PostCard extends ConsumerWidget {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: limeGreen.withOpacity(0.1),
+                                  color: colors.accentColor.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.calendar_today_outlined,
                                   size: 14,
-                                  color: limeGreen,
+                                  color: colors.accentColor,
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              Text(
-                                DateFormat('dd.MM.yyyy HH:mm').format(post.createdAt),
-                                style: TextStyle(
-                                  color: greyColor,
-                                  fontSize: compact ? 12 : 13,
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.0,
-                                ),
-                              ),
+                                  Text(
+                                    DateFormat('dd.MM.yyyy HH:mm').format(post.createdAt),
+                                    style: TextStyle(
+                                      color: isDark ? colors.greyColor : greyColorDark,
+                                      fontSize: compact ? 12 : 13,
+                                      fontWeight: FontWeight.w500,
+                                      height: 1.0,
+                                    ),
+                                  ),
                               const Spacer(),
                             ],
                             Container(
@@ -293,21 +286,21 @@ class PostCard extends ConsumerWidget {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: limeGreen.withOpacity(0.1),
+                                color: colors.accentColor.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.visibility_outlined,
                                     size: 14,
-                                    color: limeGreen,
+                                    color: colors.accentColor,
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
                                     '${post.views}',
                                     style: TextStyle(
-                                      color: limeGreen,
+                                      color: colors.accentColor,
                                       fontSize: compact ? 12 : 13,
                                       fontWeight: FontWeight.bold,
                                       height: 1.0,
@@ -321,13 +314,13 @@ class PostCard extends ConsumerWidget {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: limeGreen.withOpacity(0.1),
+                                  color: colors.accentColor.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.arrow_forward_ios_rounded,
                                   size: 14,
-                                  color: limeGreen,
+                                  color: colors.accentColor,
                                 ),
                               ),
                           ],
@@ -344,7 +337,9 @@ class PostCard extends ConsumerWidget {
   }
 
   Widget _buildPostPreview(
-    ChannelPost post, {
+    ChannelPost post,
+    AppColors colors, {
+    required bool isDark,
     required double fontSize,
     required int maxLines,
   }) {
@@ -361,7 +356,7 @@ class PostCard extends ConsumerWidget {
         return Text(
           controller.document.toPlainText(),
           style: TextStyle(
-            color: textColorSecondary,
+            color: isDark ? colors.textColorSecondary : textColorSecondaryDark,
             fontSize: fontSize,
             height: 1.25,
             letterSpacing: 0.2,
@@ -372,14 +367,14 @@ class PostCard extends ConsumerWidget {
       } catch (e) {
         return Text(
           'Ошибка загрузки контента',
-          style: TextStyle(color: limeGreen.withOpacity(0.7)),
+          style: TextStyle(color: colors.accentColor.withOpacity(0.7)),
         );
       }
     } else {
       return Text(
         post.content.replaceAll(RegExp(r'[#*`>\-\[\]]+'), '').trim(),
         style: TextStyle(
-          color: textColorSecondary,
+          color: isDark ? colors.textColorSecondary : textColorSecondaryDark,
           fontSize: fontSize,
           height: 1.25,
           letterSpacing: 0.2,

@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
+import 'package:northern_trader/common/widgets/theme_toggle_button.dart';
 import 'package:northern_trader/features/auth/controller/auth_controller.dart';
 import 'package:northern_trader/features/channels/screens/channels_list_screen.dart';
 import 'package:northern_trader/features/chat/widgets/chat_contacts_list.dart';
@@ -49,6 +51,10 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
   }
 
   void _showProfileMenu(BuildContext context, String userName, String? profilePic) {
+    final themeMode = ref.read(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -58,8 +64,8 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              cardColor,
-              appBarColor,
+              colors.cardColor,
+              colors.appBarColor,
             ],
           ),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -79,7 +85,7 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
               width: 50,
               height: 5,
               decoration: BoxDecoration(
-                color: greyColor.withOpacity(0.4),
+                color: colors.greyColor.withOpacity(0.4),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -119,8 +125,8 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
                           shape: BoxShape.circle,
                           gradient: LinearGradient(
                             colors: [
-                              appBarColor,
-                              cardColor,
+                              colors.appBarColor,
+                              colors.cardColor,
                             ],
                           ),
                         ),
@@ -136,10 +142,10 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
             const SizedBox(height: 20),
             Text(
               userName,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: textColor,
+                color: colors.textColor,
                 letterSpacing: 0.5,
               ),
             ),
@@ -212,47 +218,31 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
   Widget build(BuildContext context) {
     final userData = ref.watch(userDataAuthProvider);
     final isOwner = userData.value?.isOwner ?? false;
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
 
     return Scaffold(
-      appBar: _currentIndex == 0
-          ? null
-          : (_currentIndex == 2 && !isOwner)
+      appBar: (_currentIndex == 2 && !isOwner)
           ? null
           : AppBar(
               elevation: 0,
-              backgroundColor: appBarColor,
+              backgroundColor: colors.appBarColor,
               centerTitle: false,
               title: Text(
-                _currentIndex == 1 ? 'Каналы' : 'Чат',
-                style: const TextStyle(
+                _currentIndex == 0 ? 'Лента' : _currentIndex == 1 ? 'Каналы' : 'Чат',
+                style: TextStyle(
                   fontSize: 22,
-                  color: textColor,
+                  color: colors.textColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              actions: _currentIndex == 1
-                  ? null
-                  : [
-                      userData.when(
-                        data: (user) {
-                          if (user == null) return const SizedBox.shrink();
-                          return IconButton(
-                            icon: CircleAvatar(
-                              radius: 18,
-                              backgroundImage: user.profilePic.isNotEmpty
-                                  ? CachedNetworkImageProvider(user.profilePic)
-                                  : null,
-                              child: user.profilePic.isEmpty
-                                  ? const Icon(Icons.person, size: 20, color: Colors.grey)
-                                  : null,
-                            ),
-                            onPressed: () => _showProfileMenu(context, user.name, user.profilePic),
-                          );
-                        },
-                        loading: () => const SizedBox.shrink(),
-                        error: (_, __) => const SizedBox.shrink(),
-                      ),
-                    ],
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: const ThemeToggleButton(),
+                ),
+              ],
             ),
       body: IndexedStack(
         index: _currentIndex,
@@ -268,8 +258,8 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              appBarColor,
-              backgroundColor,
+              colors.appBarColor,
+              colors.backgroundColor,
             ],
           ),
           boxShadow: [
@@ -288,8 +278,8 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
             });
           },
           backgroundColor: Colors.transparent,
-          selectedItemColor: limeGreen,
-          unselectedItemColor: greyColor,
+          selectedItemColor: colors.accentColorDark,
+          unselectedItemColor: colors.greyColor,
           selectedLabelStyle: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 13,
@@ -306,7 +296,7 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: _currentIndex == 0
-                      ? limeGreen.withOpacity(0.15)
+                      ? colors.accentColorDark.withOpacity(0.15)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -324,7 +314,7 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: _currentIndex == 1
-                      ? limeGreen.withOpacity(0.15)
+                      ? colors.accentColorDark.withOpacity(0.15)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -342,7 +332,7 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: _currentIndex == 2
-                      ? limeGreen.withOpacity(0.15)
+                      ? colors.accentColorDark.withOpacity(0.15)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),

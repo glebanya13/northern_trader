@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:intl/intl.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
 import 'package:northern_trader/models/channel_post.dart';
 import 'package:northern_trader/models/channel.dart';
 
-class FeedPostCard extends StatelessWidget {
+class FeedPostCard extends ConsumerWidget {
   final ChannelPost post;
   final Channel channel;
   final VoidCallback? onTap;
@@ -20,28 +21,19 @@ class FeedPostCard extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
+    
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
+        color: colors.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: limeGreen.withOpacity(0.2),
+          color: limeGreenLight.withOpacity(0.25),
           width: 1.5,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            color: limeGreen.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 0),
-          ),
-        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -53,126 +45,137 @@ class FeedPostCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-              if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(14),
-                  ),
-                  child: AspectRatio(
-                    aspectRatio: 2.0,
-                    child: CachedNetworkImage(
-                      imageUrl: post.imageUrl!,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        color: cardColorLight,
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            color: limeGreen,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: cardColorLight,
-                        child: const Icon(
-                          Icons.image_not_supported,
-                          size: 48,
-                          color: greyColor,
-                        ),
-                      ),
+                // Название канала вверху
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12.0, 10.0, 12.0, 6.0),
+                  child: Text(
+                    channel.name,
+                    style: TextStyle(
+                      color: colors.accentColor,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      height: 1.0,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      post.title,
-                      style: const TextStyle(
-                        color: textColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        height: 1.15,
-                        letterSpacing: -0.3,
+                // Изображение (если есть)
+                if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
+                  ClipRRect(
+                    child: AspectRatio(
+                      aspectRatio: 2.0,
+                      child: CachedNetworkImage(
+                        imageUrl: post.imageUrl!,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          color: colors.cardColorLight,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: colors.accentColor,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: colors.cardColorLight,
+                          child: Icon(
+                            Icons.image_not_supported,
+                            size: 48,
+                            color: isDark ? colors.greyColor : greyColorDark,
+                          ),
+                        ),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 5),
-                    if (_getContentPreview(post).isNotEmpty)
-                      Text(
-                        _getContentPreview(post),
-                        style: const TextStyle(
-                          color: textColorSecondary,
-                          fontSize: 15,
-                          height: 1.25,
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    const SizedBox(height: 7),
-                    Row(
+                  ),
+                // Контент поста
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
+                        // Заголовок поста
                         Text(
-                          'от ${channel.name}',
-                          style: const TextStyle(
-                            color: greyColor,
-                            fontSize: 12,
-                            height: 1.0,
+                          post.title,
+                          style: TextStyle(
+                            color: isDark ? colors.textColor : textColorDark,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            height: 1.2,
+                            letterSpacing: -0.3,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const Spacer(),
-                        Text(
-                          _formatDate(post.createdAt),
-                          style: const TextStyle(
-                            color: greyColor,
-                            fontSize: 12,
-                            height: 1.0,
+                        const SizedBox(height: 4),
+                        // Превью контента
+                        if (_getContentPreview(post).isNotEmpty)
+                          Flexible(
+                            child: Text(
+                              _getContentPreview(post),
+                              style: TextStyle(
+                                color: isDark ? colors.textColorSecondary : textColorSecondaryDark,
+                                fontSize: 14,
+                                height: 1.3,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
+                        const SizedBox(height: 6),
+                        // Дата и статистика
+                        Row(
+                          children: [
+                            Text(
+                              _formatDate(post.createdAt),
+                              style: TextStyle(
+                                color: isDark ? colors.greyColor : greyColorDark,
+                                fontSize: 11,
+                                height: 1.0,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Icon(
+                              Icons.chat_bubble_outline,
+                              size: 14,
+                              color: isDark ? colors.greyColor : greyColorDark,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              '0',
+                              style: TextStyle(
+                                color: isDark ? colors.greyColor : greyColorDark,
+                                fontSize: 11,
+                                height: 1.0,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Icon(
+                              Icons.rocket_launch_outlined,
+                              size: 14,
+                              color: isDark ? colors.greyColor : greyColorDark,
+                            ),
+                            const SizedBox(width: 3),
+                            Flexible(
+                              child: Text(
+                                '${post.views}',
+                                style: TextStyle(
+                                  color: isDark ? colors.greyColor : greyColorDark,
+                                  fontSize: 11,
+                                  height: 1.0,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    const SizedBox(height: 3),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.chat_bubble_outline,
-                          size: 16,
-                          color: greyColor,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '0',
-                          style: TextStyle(
-                            color: greyColor,
-                            fontSize: 12,
-                            height: 1.0,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Icon(
-                          Icons.rocket_launch_outlined,
-                          size: 16,
-                          color: greyColor,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${post.views}',
-                          style: TextStyle(
-                            color: greyColor,
-                            fontSize: 12,
-                            height: 1.0,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
-              ),
               ],
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
 import 'package:northern_trader/common/widgets/loader.dart';
 import 'package:northern_trader/features/auth/controller/auth_controller.dart';
 import 'package:northern_trader/features/chat/widgets/bottom_chat_field.dart';
@@ -24,6 +25,9 @@ class MobileChatScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userData = ref.watch(userDataAuthProvider);
     final isOwner = userData.value?.isOwner ?? false;
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
     
     return WillPopScope(
       onWillPop: () async {
@@ -33,14 +37,14 @@ class MobileChatScreen extends ConsumerWidget {
         return isOwner;
       },
       child: Scaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: colors.backgroundColor,
         appBar: AppBar(
-          backgroundColor: appBarColor,
-          foregroundColor: textColor,
-          iconTheme: const IconThemeData(color: textColor),
+          backgroundColor: colors.appBarColor,
+          foregroundColor: colors.textColor,
+          iconTheme: IconThemeData(color: colors.textColor),
           automaticallyImplyLeading: isOwner,
           leading: isOwner ? IconButton(
-            icon: const Icon(Icons.arrow_back, color: textColor),
+            icon: Icon(Icons.arrow_back, color: colors.textColor),
             onPressed: () => Navigator.pop(context),
           ) : null,
           title: StreamBuilder<UserModel>(
@@ -54,18 +58,18 @@ class MobileChatScreen extends ConsumerWidget {
                 children: [
                   Text(
                     isOwner ? 'Чат' : name,
-                    style: const TextStyle(
-                      color: textColor,
+                    style: TextStyle(
+                      color: colors.textColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   if (!isOwner)
                     Text(
                       snapshot.data?.isOnline == true ? 'online' : 'offline',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.normal,
-                        color: greyColor,
+                        color: colors.greyColor,
                       ),
                     ),
                 ],
@@ -75,7 +79,7 @@ class MobileChatScreen extends ConsumerWidget {
           centerTitle: false,
         ),
         body: Container(
-          color: backgroundColor,
+          color: colors.backgroundColor,
           child: Column(
             children: [
               Expanded(

@@ -1,17 +1,17 @@
 import 'dart:convert';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:intl/intl.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
 import 'package:northern_trader/common/utils/utils.dart';
 import 'package:northern_trader/common/widgets/loader.dart';
 import 'package:northern_trader/common/widgets/post_card.dart';
 import 'package:northern_trader/features/auth/controller/auth_controller.dart';
 import 'package:northern_trader/features/channels/controller/channels_controller.dart';
 import 'package:northern_trader/features/channels/screens/create_post_screen.dart';
+import 'package:northern_trader/features/channels/screens/channel_post_detail_screen.dart';
 import 'package:northern_trader/models/channel.dart';
 import 'package:northern_trader/models/channel_post.dart';
 
@@ -32,15 +32,18 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
     final postsStream = ref.watch(channelsControllerProvider).getChannelPosts(widget.channel.id);
     final userData = ref.watch(userDataAuthProvider);
     final isOwner = userData.value?.isOwner ?? false;
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final colors = AppColors(isDark);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: appBarColor,
+        backgroundColor: colors.appBarColor,
         title: Text(widget.channel.name),
         actions: isOwner
             ? [
                 IconButton(
-                  icon: const Icon(Icons.add, color: limeGreen),
+                  icon: Icon(Icons.add, color: colors.accentColor),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -69,11 +72,11 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, color: limeGreen.withOpacity(0.6), size: 48),
+                    Icon(Icons.error_outline, color: colors.accentColor.withOpacity(0.6), size: 48),
                     const SizedBox(height: 16),
                     Text(
                       'Ошибка: ${snapshot.error}',
-                      style: const TextStyle(color: greyColor),
+                      style: TextStyle(color: colors.greyColor),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -85,15 +88,15 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
           final posts = snapshot.data ?? [];
 
           if (posts.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.article, size: 64, color: greyColor),
-                  SizedBox(height: 16),
+                  Icon(Icons.article, size: 64, color: colors.greyColor),
+                  const SizedBox(height: 16),
                   Text(
                     'Пока нет постов',
-                    style: TextStyle(color: greyColor, fontSize: 16),
+                    style: TextStyle(color: colors.greyColor, fontSize: 16),
                   ),
                 ],
               ),
@@ -127,7 +130,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
                           ),
                           child: GestureDetector(
                             onLongPress: isOwner && post.id.isNotEmpty
-                                ? () => _showPostActions(context, post)
+                                ? () => _showPostActions(context, post, colors)
                                 : null,
                             child: PostCard(
                               post: post,
@@ -140,7 +143,16 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
                                         widget.channel.id,
                                         post.id,
                                       );
-                                  _showPostDetail(context, post, isOwner);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ChannelPostDetailScreen(
+                                        channel: widget.channel,
+                                        post: post,
+                                        isOwner: isOwner,
+                                      ),
+                                    ),
+                                  );
                                 }
                               },
                             ),
@@ -158,165 +170,8 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
     );
   }
 
-  void _showPostDetail(BuildContext context, ChannelPost post, bool isOwner) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: DraggableScrollableSheet(
-        initialChildSize: 0.9,
-        minChildSize: 0.5,
-        maxChildSize: 1.0,
-        builder: (context, scrollController) => SingleChildScrollView(
-          controller: scrollController,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: greyColor.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                if (isOwner)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton.icon(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _showEditPostDialog(context, post);
-                          },
-                          icon: const Icon(Icons.edit_outlined, size: 18),
-                          label: const Text('Редактировать'),
-                          style: TextButton.styleFrom(
-                            foregroundColor: limeGreen,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        TextButton.icon(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _deletePost(context, post);
-                          },
-                          icon: Icon(Icons.delete_outline, size: 18, color: Colors.red[400]),
-                          label: Text('Удалить', style: TextStyle(color: Colors.red[400])),
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.red[400],
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: CachedNetworkImage(
-                      imageUrl: post.imageUrl!,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        height: 200,
-                        color: appBarColor,
-                        child: Center(
-                          child: CircularProgressIndicator(color: limeGreen),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        height: 200,
-                        color: appBarColor,
-                        child: Icon(
-                          Icons.image_not_supported,
-                          size: 48,
-                          color: greyColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
-                  const SizedBox(height: 24),
-                                Text(
-                                  post.title,
-                                  style: const TextStyle(
-                                    color: textColor,
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold,
-                                    height: 1.3,
-                                    letterSpacing: -0.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 28),
-                                _buildPostContent(post, isPreview: false),
-                                const SizedBox(height: 20),
-                                Container(
-                                  padding: const EdgeInsets.all(14),
-                                  decoration: BoxDecoration(
-                                    color: cardColorLight,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: dividerColor.withOpacity(0.3),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.visibility_outlined, size: 18, color: greyColor),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        'Просмотров: ${post.views}',
-                                        style: const TextStyle(
-                                          color: greyColor,
-                                          fontSize: 14,
-                                          height: 1.0,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Row(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          Icon(Icons.calendar_today_outlined, size: 18, color: greyColor),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            DateFormat('dd.MM.yyyy HH:mm').format(post.createdAt),
-                                            style: const TextStyle(
-                                              color: greyColor,
-                                              fontSize: 14,
-                                              height: 1.0,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
-        ),
-        ),
-      ),
-    );
-  }
 
-  void _showPostActions(BuildContext context, ChannelPost post) {
+  void _showPostActions(BuildContext context, ChannelPost post, AppColors colors) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -327,8 +182,8 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              cardColor,
-              appBarColor,
+              colors.cardColor,
+              colors.appBarColor,
             ],
           ),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -348,104 +203,20 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
               height: 5,
               margin: const EdgeInsets.only(bottom: 24),
               decoration: BoxDecoration(
-                color: greyColor.withOpacity(0.4),
+                color: colors.greyColor.withOpacity(0.4),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
             Text(
               'Действия с постом',
               style: TextStyle(
-                color: textColor,
+                color: colors.textColor,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,
               ),
             ),
             const SizedBox(height: 20),
-            Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    limeGreen.withOpacity(0.15),
-                    limeGreen.withOpacity(0.05),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: limeGreen.withOpacity(0.3),
-                  width: 1.5,
-                ),
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showEditPostDialog(context, post);
-                  },
-                  borderRadius: BorderRadius.circular(16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: limeGreen.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: limeGreen.withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.edit_rounded,
-                            color: limeGreen,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Редактировать',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.3,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Изменить содержимое поста',
-                                style: TextStyle(
-                                  color: greyColor,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          color: limeGreen,
-                          size: 18,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -467,7 +238,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
                 child: InkWell(
                   onTap: () {
                     Navigator.pop(context);
-                    _deletePost(context, post);
+                    _deletePost(context, post, colors);
                   },
                   borderRadius: BorderRadius.circular(16),
                   child: Padding(
@@ -508,10 +279,10 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              const Text(
+                              Text(
                                 'Удалить пост навсегда',
                                 style: TextStyle(
-                                  color: greyColor,
+                                  color: colors.greyColor,
                                   fontSize: 13,
                                 ),
                               ),
@@ -536,173 +307,11 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
     );
   }
 
-
-  void _showEditPostDialog(BuildContext context, ChannelPost post) {
-    final titleController = TextEditingController(text: post.title);
-    final contentController = TextEditingController(text: post.content);
-    final imageUrlController = TextEditingController(text: post.imageUrl ?? '');
-
+  void _deletePost(BuildContext context, ChannelPost post, AppColors colors) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Редактировать пост',
-          style: TextStyle(
-            color: textColor,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: titleController,
-                style: const TextStyle(color: textColor, fontSize: 16),
-                decoration: InputDecoration(
-                  labelText: 'Заголовок',
-                  labelStyle: const TextStyle(color: greyColor),
-                  filled: true,
-                  fillColor: appBarColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: dividerColor),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: dividerColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: limeGreen, width: 2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: contentController,
-                maxLines: 10,
-                style: const TextStyle(color: textColor, fontSize: 15, height: 1.5),
-                decoration: InputDecoration(
-                  labelText: 'Содержание (Markdown)',
-                  labelStyle: const TextStyle(color: greyColor),
-                  alignLabelWithHint: true,
-                  filled: true,
-                  fillColor: appBarColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: dividerColor),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: dividerColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: limeGreen, width: 2),
-                  ),
-                  hintText: '# Заголовок\n\n**Жирный** *Курсив*\n\n- Список',
-                  hintStyle: TextStyle(color: greyColor.withOpacity(0.5), fontSize: 13),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: imageUrlController,
-                style: const TextStyle(color: textColor, fontSize: 15),
-                decoration: InputDecoration(
-                  labelText: 'URL изображения (необязательно)',
-                  labelStyle: const TextStyle(color: greyColor),
-                  filled: true,
-                  fillColor: appBarColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: dividerColor),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: dividerColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: limeGreen, width: 2),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            ),
-            child: const Text(
-              'Отмена',
-              style: TextStyle(
-                color: greyColor,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (widget.channel.id.isEmpty || post.id.isEmpty) {
-                showSnackBar(context: context, content: 'Ошибка: ID канала или поста пустой');
-                return;
-              }
-              if (titleController.text.trim().isEmpty || contentController.text.trim().isEmpty) {
-                showSnackBar(context: context, content: 'Заполните все обязательные поля');
-                return;
-              }
-              
-              try {
-                await ref.read(channelsControllerProvider).updatePost(
-                  widget.channel.id,
-                  post.id,
-                  {
-                    'title': titleController.text.trim(),
-                    'content': contentController.text.trim(),
-                    'imageUrl': imageUrlController.text.trim().isEmpty ? null : imageUrlController.text.trim(),
-                  },
-                );
-                Navigator.pop(context);
-                showSnackBar(context: context, content: 'Пост обновлен');
-              } catch (e) {
-                showSnackBar(context: context, content: 'Ошибка: ${e.toString()}');
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: limeGreen,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text(
-              'Сохранить',
-              style: TextStyle(
-                color: textColor,
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _deletePost(BuildContext context, ChannelPost post) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: cardColor,
+        backgroundColor: colors.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
@@ -715,11 +324,11 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
               child: Icon(Icons.warning_amber_rounded, color: Colors.red[300], size: 24),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Text(
                 'Удалить пост?',
                 style: TextStyle(
-                  color: textColor,
+                  color: colors.textColor,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -727,10 +336,10 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
             ),
           ],
         ),
-        content: const Text(
+        content: Text(
           'Вы уверены, что хотите удалить этот пост? Это действие нельзя отменить.',
           style: TextStyle(
-            color: textColorSecondary,
+            color: colors.textColorSecondary,
             fontSize: 15,
             height: 1.5,
           ),
@@ -741,10 +350,10 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            child: const Text(
+            child: Text(
               'Отмена',
               style: TextStyle(
-                color: greyColor,
+                color: colors.greyColor,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -790,7 +399,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
     );
   }
 
-  Widget _buildPostContent(ChannelPost post, {bool isPreview = false}) {
+  Widget _buildPostContent(ChannelPost post, AppColors colors, {bool isPreview = false, required bool isDark}) {
     if (post.contentType == 'quill') {
       try {
         final deltaJson = jsonDecode(post.content) as List;
@@ -804,8 +413,8 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
         if (isPreview) {
           return Text(
             controller.document.toPlainText(),
-            style: const TextStyle(
-              color: Color.fromRGBO(210, 210, 210, 1),
+            style: TextStyle(
+              color: colors.textColor,
               fontSize: 16,
               height: 1.7,
               letterSpacing: 0.2,
@@ -814,34 +423,44 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
             overflow: TextOverflow.ellipsis,
           );
         } else {
-          return AbsorbPointer(
+          return Container(
+            decoration: BoxDecoration(
+              color: colors.backgroundColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: AbsorbPointer(
             absorbing: true,
             child: Builder(
               builder: (context) => Theme(
                 data: Theme.of(context).copyWith(
+                    scaffoldBackgroundColor: colors.backgroundColor,
                   textTheme: Theme.of(context).textTheme.copyWith(
-                    bodyLarge: const TextStyle(
-                      color: Color.fromRGBO(220, 220, 220, 1),
+                    bodyLarge: TextStyle(
+                      color: colors.textColor,
                       fontSize: 17,
                       height: 1.8,
                     ),
-                    bodyMedium: const TextStyle(
-                      color: Color.fromRGBO(220, 220, 220, 1),
+                    bodyMedium: TextStyle(
+                      color: colors.textColor,
                       fontSize: 17,
                       height: 1.8,
                     ),
                   ),
                 ),
                 child: DefaultTextStyle(
-                  style: const TextStyle(
-                    color: Color.fromRGBO(220, 220, 220, 1),
+                  style: TextStyle(
+                    color: colors.textColor,
                     fontSize: 17,
                     height: 1.8,
                   ),
+                    child: Container(
+                      color: colors.backgroundColor,
                   child: quill.QuillEditor(
                     controller: controller,
                     focusNode: FocusNode(),
                     scrollController: ScrollController(),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -858,8 +477,8 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
       if (isPreview) {
         return Text(
           post.content.replaceAll(RegExp(r'[#*`>\-\[\]]+'), '').trim(),
-          style: const TextStyle(
-            color: Color.fromRGBO(210, 210, 210, 1),
+          style: TextStyle(
+            color: colors.textColor,
             fontSize: 16,
             height: 1.7,
             letterSpacing: 0.2,
@@ -872,74 +491,74 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
           data: post.content,
           selectable: true,
           styleSheet: MarkdownStyleSheet(
-            p: const TextStyle(
-              color: Color.fromRGBO(220, 220, 220, 1),
+            p: TextStyle(
+              color: colors.textColor,
               fontSize: 17,
               height: 1.8,
               letterSpacing: 0.3,
             ),
-            h1: const TextStyle(
-              color: textColor,
+            h1: TextStyle(
+              color: colors.textColor,
               fontSize: 28,
               fontWeight: FontWeight.bold,
               height: 1.3,
             ),
-            h2: const TextStyle(
-              color: textColor,
+            h2: TextStyle(
+              color: colors.textColor,
               fontSize: 24,
               fontWeight: FontWeight.bold,
               height: 1.3,
             ),
-            h3: const TextStyle(
-              color: textColor,
+            h3: TextStyle(
+              color: colors.textColor,
               fontSize: 21,
               fontWeight: FontWeight.bold,
               height: 1.4,
             ),
-            listBullet: const TextStyle(
-              color: limeGreen,
+            listBullet: TextStyle(
+              color: colors.accentColor,
               fontSize: 18,
             ),
             listIndent: 24,
             blockquoteDecoration: BoxDecoration(
-              color: cardColorLight,
+              color: isDark ? colors.cardColorLight : cardColorLightLight,
               borderRadius: BorderRadius.circular(8),
-              border: const Border(
-                left: BorderSide(color: limeGreen, width: 4),
+              border: Border(
+                left: BorderSide(color: colors.accentColor, width: 4),
               ),
             ),
             blockquotePadding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
-            blockquote: const TextStyle(
-              color: textColorSecondary,
+            blockquote: TextStyle(
+              color: isDark ? colors.textColorSecondary : textColorSecondaryLight,
               fontStyle: FontStyle.italic,
               fontSize: 16,
               height: 1.7,
             ),
             code: TextStyle(
-              backgroundColor: cardColorLight,
-              color: limeGreen,
+              backgroundColor: isDark ? colors.cardColorLight : cardColorLightLight,
+              color: colors.accentColor,
               fontSize: 15,
               fontFamily: 'monospace',
             ),
             codeblockDecoration: BoxDecoration(
-              color: cardColorLight,
+              color: isDark ? colors.cardColorLight : cardColorLightLight,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: limeGreen.withOpacity(0.2),
+                color: colors.accentColor.withOpacity(0.2),
                 width: 1,
               ),
             ),
             codeblockPadding: const EdgeInsets.all(16),
-            strong: const TextStyle(
-              color: textColor,
+            strong: TextStyle(
+              color: colors.textColor,
               fontWeight: FontWeight.bold,
             ),
-            em: const TextStyle(
-              color: textColorSecondary,
+            em: TextStyle(
+              color: colors.textColorSecondary,
               fontStyle: FontStyle.italic,
             ),
-            a: const TextStyle(
-              color: limeGreen,
+            a: TextStyle(
+              color: colors.accentColor,
               decoration: TextDecoration.underline,
               fontWeight: FontWeight.w600,
             ),
