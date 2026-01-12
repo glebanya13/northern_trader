@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:northern_trader/common/utils/colors.dart';
 import 'package:northern_trader/common/providers/theme_provider.dart';
-import 'package:northern_trader/common/widgets/theme_toggle_button.dart';
 import 'package:northern_trader/features/auth/controller/auth_controller.dart';
 import 'package:northern_trader/features/channels/screens/channels_list_screen.dart';
 import 'package:northern_trader/features/chat/widgets/chat_contacts_list.dart';
 import 'package:northern_trader/features/feed/screens/feed_screen.dart';
 import 'package:northern_trader/features/landing/screens/landing_screen.dart';
+import 'package:northern_trader/features/reviews/screens/reviews_screen.dart';
 
 class MobileLayoutScreen extends ConsumerStatefulWidget {
   const MobileLayoutScreen({Key? key}) : super(key: key);
@@ -63,15 +63,18 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
+            colors: isDark ? [
               colors.cardColor,
               colors.appBarColor,
+            ] : [
+              cardColorLight,
+              appBarColorLight,
             ],
           ),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
               blurRadius: 20,
               offset: const Offset(0, -4),
             ),
@@ -223,31 +226,53 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
     final colors = AppColors(isDark);
 
     return Scaffold(
-      appBar: (_currentIndex == 2 && !isOwner)
+      appBar: (_currentIndex == 3 && !isOwner)
           ? null
           : AppBar(
               elevation: 0,
               backgroundColor: colors.appBarColor,
               centerTitle: false,
-              title: Text(
-                _currentIndex == 0 ? 'Лента' : _currentIndex == 1 ? 'Каналы' : 'Чат',
-                style: TextStyle(
-                  fontSize: 22,
-                  color: colors.textColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: const ThemeToggleButton(),
-                ),
-              ],
+              title: _currentIndex == 2 || _currentIndex == 3
+                  ? Text(
+                      _currentIndex == 2 ? 'Каналы' : 'Чат',
+                      style: TextStyle(
+                        fontSize: 22,
+                        color: colors.textColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.asset(
+                            'assets/header_logo.jpg',
+                            height: 40,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            "Команда профессиональных трейдеров\nTrader's University",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: colors.textColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+              actions: [],
             ),
       body: IndexedStack(
         index: _currentIndex,
         children: const [
           FeedScreen(),
+          ReviewsScreen(),
           ChannelsListScreen(),
           ChatContactsList(),
         ],
@@ -307,7 +332,7 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
                   size: 26,
                 ),
               ),
-              label: 'Лента',
+              label: 'Посты',
             ),
             BottomNavigationBarItem(
               icon: Container(
@@ -320,12 +345,12 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
                 ),
                 child: Icon(
                   _currentIndex == 1
-                      ? Icons.rss_feed_rounded
-                      : Icons.rss_feed_outlined,
+                      ? Icons.analytics_rounded
+                      : Icons.analytics_outlined,
                   size: 26,
                 ),
               ),
-              label: 'Каналы',
+              label: 'Обзоры',
             ),
             BottomNavigationBarItem(
               icon: Container(
@@ -338,6 +363,24 @@ class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
                 ),
                 child: Icon(
                   _currentIndex == 2
+                      ? Icons.rss_feed_rounded
+                      : Icons.rss_feed_outlined,
+                  size: 26,
+                ),
+              ),
+              label: 'Каналы',
+            ),
+            BottomNavigationBarItem(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: _currentIndex == 3
+                      ? colors.accentColorDark.withOpacity(0.15)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  _currentIndex == 3
                       ? Icons.chat_rounded
                       : Icons.chat_outlined,
                   size: 26,

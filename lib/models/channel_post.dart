@@ -8,6 +8,7 @@ class ChannelPost {
   final String? videoUrl;
   final DateTime createdAt;
   final int views;
+  final bool showInFeed; // Показывать ли пост в общей ленте
 
   ChannelPost({
     required this.id,
@@ -19,6 +20,7 @@ class ChannelPost {
     this.videoUrl,
     required this.createdAt,
     this.views = 0,
+    this.showInFeed = true, // По умолчанию показывать в ленте (для обратной совместимости)
   });
 
   Map<String, dynamic> toMap() {
@@ -32,6 +34,7 @@ class ChannelPost {
       'videoUrl': videoUrl,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'views': views,
+      'showInFeed': showInFeed,
     };
   }
 
@@ -46,6 +49,7 @@ class ChannelPost {
       videoUrl: map['videoUrl'],
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] ?? DateTime.now().millisecondsSinceEpoch),
       views: map['views'] ?? 0,
+      showInFeed: map['showInFeed'] ?? true, // По умолчанию true для старых постов
     );
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:northern_trader/common/utils/colors.dart';
 import 'package:northern_trader/common/providers/theme_provider.dart';
-import 'package:northern_trader/common/widgets/theme_toggle_button.dart';
 import 'package:northern_trader/common/utils/utils.dart';
 import 'package:northern_trader/common/widgets/custom_button.dart';
 import 'package:northern_trader/features/auth/controller/auth_controller.dart';
@@ -102,12 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: colors.backgroundColor,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: const ThemeToggleButton(),
-          ),
-        ],
+        actions: [],
       ),
       body: Center(
         child: SingleChildScrollView(

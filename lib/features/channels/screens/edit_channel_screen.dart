@@ -1,8 +1,16 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:uuid/uuid.dart';
 import 'package:northern_trader/common/utils/colors.dart';
+import 'package:northern_trader/common/providers/theme_provider.dart';
+import 'package:northern_trader/common/repositories/common_firebase_storage_repository.dart';
+import 'package:northern_trader/common/services/cloudinary_service.dart';
 import 'package:northern_trader/common/utils/utils.dart';
 import 'package:northern_trader/features/channels/controller/channels_controller.dart';
+import 'package:northern_trader/features/auth/controller/auth_controller.dart';
 import 'package:northern_trader/models/channel.dart';
 
 class EditChannelScreen extends ConsumerStatefulWidget {
@@ -22,6 +30,7 @@ class _EditChannelScreenState extends ConsumerState<EditChannelScreen> {
   late final TextEditingController _descriptionController;
   late final TextEditingController _imageUrlController;
   bool _isLoading = false;
+  bool _isUploadingImage = false;
 
   @override
   void initState() {
@@ -37,6 +46,63 @@ class _EditChannelScreenState extends ConsumerState<EditChannelScreen> {
     _descriptionController.dispose();
     _imageUrlController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImageFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.single;
+        
+        if (kIsWeb && file.bytes == null) {
+          throw Exception('Не удалось загрузить файл');
+        }
+
+        setState(() {
+          _isUploadingImage = true;
+        });
+
+        String? imageUrl;
+        
+        if (kIsWeb) {
+          imageUrl = await CloudinaryService.uploadImage(file);
+        } else {
+          final userData = ref.read(userDataAuthProvider).value;
+          if (userData == null) {
+            throw Exception('Пользователь не авторизован');
+          }
+          final imageId = const Uuid().v4();
+          final storageRef = 'channels/images/${userData.uid}/$imageId';
+          final dartFile = File(file.path!);
+          imageUrl = await ref
+              .read(commonFirebaseStorageRepositoryProvider)
+              .storeFileToFirebase(storageRef, dartFile);
+        }
+
+        if (imageUrl == null) {
+          throw Exception('Не удалось получить URL изображения');
+        }
+
+        setState(() {
+          _imageUrlController.text = imageUrl!;
+          _isUploadingImage = false;
+        });
+
+        if (mounted) {
+          showSnackBar(context: context, content: 'Изображение загружено');
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isUploadingImage = false;
+      });
+      if (mounted) {
+        showSnackBar(context: context, content: 'Ошибка загрузки: $e');
+      }
+    }
   }
 
   Future<void> _save() async {
@@ -151,26 +217,91 @@ class _EditChannelScreenState extends ConsumerState<EditChannelScreen> {
                 },
               ),
               const SizedBox(height: 20),
-              TextFormField(
-                controller: _imageUrlController,
-                style: const TextStyle(color: textColor),
-                decoration: InputDecoration(
-                  labelText: 'URL изображения (необязательно)',
-                  labelStyle: const TextStyle(color: greyColor),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: dividerColor),
+              const Text(
+                'Изображение канала',
+                style: TextStyle(
+                  color: greyColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _imageUrlController,
+                      style: const TextStyle(color: textColor),
+                      decoration: InputDecoration(
+                        labelText: 'URL изображения',
+                        labelStyle: const TextStyle(color: greyColor),
+                        hintText: 'https://example.com/image.jpg',
+                        hintStyle: TextStyle(color: greyColor.withOpacity(0.6)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: dividerColor),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: dividerColor),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: limeGreen, width: 2),
+                        ),
+                        fillColor: cardColor,
+                        filled: true,
+                      ),
+                    ),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: dividerColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: limeGreen, width: 2),
-                  ),
-                  fillColor: cardColor,
-                  filled: true,
+                  const SizedBox(width: 12),
+                  _isUploadingImage
+                      ? Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.green, width: 2),
+                          ),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ),
+                        )
+                      : InkWell(
+                          onTap: _pickImageFile,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: Colors.green.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.green, width: 2),
+                            ),
+                            child: const Icon(
+                              Icons.add_photo_alternate,
+                              color: Colors.green,
+                              size: 32,
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Загрузите изображение с ПК или вставьте URL',
+                style: TextStyle(
+                  color: greyColor.withOpacity(0.8),
+                  fontSize: 12,
                 ),
               ),
               const SizedBox(height: 40),

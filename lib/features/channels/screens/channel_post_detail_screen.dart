@@ -65,7 +65,7 @@ class ChannelPostDetailScreen extends ConsumerWidget {
                 IconButton(
                   icon: Icon(Icons.delete_outline, color: Colors.red[400]),
                   onPressed: () {
-                    ChannelPostDetailScreen._showDeleteDialog(context, ref, channel, post, colors);
+                    ChannelPostDetailScreen._showDeleteDialog(context, ref, channel, post, colors, isDark);
                   },
                   tooltip: 'Удалить',
                 ),
@@ -119,7 +119,7 @@ class ChannelPostDetailScreen extends ConsumerWidget {
                                 child: Icon(
                                   Icons.image_not_supported,
                                   size: 64,
-                                  color: colors.greyColor,
+                                  color: colors.cardGreyColor,
                                 ),
                               ),
                             ),
@@ -130,7 +130,7 @@ class ChannelPostDetailScreen extends ConsumerWidget {
                           MediaQuery.of(context).size.width > 600 ? 16 : 12,
                         ),
                         decoration: BoxDecoration(
-                          color: isDark ? colors.cardColor : cardColorLightLight,
+                          color: colors.cardColor,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: colors.accentColor.withOpacity(0.2),
@@ -190,7 +190,7 @@ class ChannelPostDetailScreen extends ConsumerWidget {
                               child: Text(
                                 channel.name,
                                 style: TextStyle(
-                                  color: colors.textColor,
+                                  color: colors.cardTextColor,
                                   fontSize: isMobile ? 14 : 16,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -202,14 +202,14 @@ class ChannelPostDetailScreen extends ConsumerWidget {
                             Icon(
                               Icons.calendar_today_outlined,
                               size: isMobile ? 16 : 16,
-                              color: colors.greyColor,
+                              color: colors.cardGreyColor,
                             ),
                             SizedBox(width: isMobile ? 6 : 8),
                             Text(
                               DateFormat('dd.MM.yyyy HH:mm')
                                   .format(post.createdAt),
                               style: TextStyle(
-                                color: colors.greyColor,
+                                color: colors.cardGreyColor,
                                 fontSize: isMobile ? 12 : 13,
                               ),
                               maxLines: 1,
@@ -387,16 +387,16 @@ class ChannelPostDetailScreen extends ConsumerWidget {
     }
   }
 
-  static void _showDeleteDialog(BuildContext context, WidgetRef ref, Channel channel, ChannelPost post, AppColors colors) {
+  static void _showDeleteDialog(BuildContext context, WidgetRef ref, Channel channel, ChannelPost post, AppColors colors, bool isDark) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: colors.cardColor,
+        backgroundColor: isDark ? colors.cardColor : cardColorLight,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Удалить пост?',
           style: TextStyle(
-            color: colors.textColor,
+            color: isDark ? colors.cardTextColor : textColorLight,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -404,7 +404,7 @@ class ChannelPostDetailScreen extends ConsumerWidget {
         content: Text(
           'Вы уверены, что хотите удалить этот пост? Это действие нельзя отменить.',
           style: TextStyle(
-            color: colors.textColorSecondary,
+            color: isDark ? colors.cardTextColorSecondary : textColorSecondaryLight,
             fontSize: 15,
           ),
         ),
@@ -417,7 +417,7 @@ class ChannelPostDetailScreen extends ConsumerWidget {
             child: Text(
               'Отмена',
               style: TextStyle(
-                color: colors.greyColor,
+                color: isDark ? colors.cardGreyColor : textColorSecondaryLight,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),

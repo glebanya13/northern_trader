@@ -130,7 +130,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
                           ),
                           child: GestureDetector(
                             onLongPress: isOwner && post.id.isNotEmpty
-                                ? () => _showPostActions(context, post, colors)
+                                ? () => _showPostActions(context, post, colors, isDark)
                                 : null,
                             child: PostCard(
                               post: post,
@@ -171,7 +171,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
   }
 
 
-  void _showPostActions(BuildContext context, ChannelPost post, AppColors colors) {
+  void _showPostActions(BuildContext context, ChannelPost post, AppColors colors, bool isDark) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -181,15 +181,18 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
+            colors: isDark ? [
               colors.cardColor,
               colors.appBarColor,
+            ] : [
+              cardColorLight,
+              appBarColorLight,
             ],
           ),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
               blurRadius: 20,
               offset: const Offset(0, -4),
             ),
@@ -238,7 +241,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
                 child: InkWell(
                   onTap: () {
                     Navigator.pop(context);
-                    _deletePost(context, post, colors);
+                    _deletePost(context, post, colors, isDark);
                   },
                   borderRadius: BorderRadius.circular(16),
                   child: Padding(
@@ -307,11 +310,11 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
     );
   }
 
-  void _deletePost(BuildContext context, ChannelPost post, AppColors colors) {
+  void _deletePost(BuildContext context, ChannelPost post, AppColors colors, bool isDark) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: colors.cardColor,
+        backgroundColor: isDark ? colors.cardColor : cardColorLight,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
@@ -328,7 +331,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
               child: Text(
                 'Удалить пост?',
                 style: TextStyle(
-                  color: colors.textColor,
+                  color: isDark ? colors.cardTextColor : textColorLight,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -339,7 +342,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
         content: Text(
           'Вы уверены, что хотите удалить этот пост? Это действие нельзя отменить.',
           style: TextStyle(
-            color: colors.textColorSecondary,
+            color: isDark ? colors.cardTextColorSecondary : textColorSecondaryLight,
             fontSize: 15,
             height: 1.5,
           ),
@@ -353,7 +356,7 @@ class _ChannelPostsScreenState extends ConsumerState<ChannelPostsScreen> {
             child: Text(
               'Отмена',
               style: TextStyle(
-                color: colors.greyColor,
+                color: isDark ? colors.cardGreyColor : textColorSecondaryLight,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),

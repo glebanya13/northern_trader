@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:northern_trader/common/utils/colors.dart';
 import 'package:northern_trader/common/providers/theme_provider.dart';
-import 'package:northern_trader/common/widgets/theme_toggle_button.dart';
 import 'package:northern_trader/models/channel_post.dart';
 import 'package:northern_trader/models/channel.dart';
 
@@ -39,12 +38,7 @@ class PostDetailScreen extends ConsumerWidget {
           icon: Icon(Icons.arrow_back, color: colors.textColor),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: const ThemeToggleButton(),
-          ),
-        ],
+        actions: [],
       ),
       body: Center(
         child: ConstrainedBox(
@@ -93,7 +87,7 @@ class PostDetailScreen extends ConsumerWidget {
                                 child: Icon(
                                   Icons.image_not_supported,
                                   size: 64,
-                                  color: colors.greyColor,
+                                  color: colors.cardGreyColor,
                                 ),
                               ),
                             ),
@@ -104,7 +98,7 @@ class PostDetailScreen extends ConsumerWidget {
                           MediaQuery.of(context).size.width > 600 ? 16 : 12,
                         ),
                         decoration: BoxDecoration(
-                          color: isDark ? colors.cardColor : cardColorLightLight,
+                          color: colors.cardColor,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: colors.accentColor.withOpacity(0.2),
@@ -164,7 +158,7 @@ class PostDetailScreen extends ConsumerWidget {
                               child: Text(
                                 channel.name,
                                 style: TextStyle(
-                                  color: colors.textColor,
+                                  color: colors.cardTextColor,
                                   fontSize: isMobile ? 14 : 16,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -176,14 +170,14 @@ class PostDetailScreen extends ConsumerWidget {
                             Icon(
                               Icons.calendar_today_outlined,
                               size: isMobile ? 16 : 16,
-                              color: colors.greyColor,
+                              color: colors.cardGreyColor,
                             ),
                             SizedBox(width: isMobile ? 6 : 8),
                             Text(
                               DateFormat('dd.MM.yyyy HH:mm')
                                   .format(post.createdAt),
                               style: TextStyle(
-                                color: colors.greyColor,
+                                color: colors.cardGreyColor,
                                 fontSize: isMobile ? 12 : 13,
                               ),
                               maxLines: 1,

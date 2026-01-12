@@ -98,10 +98,10 @@ class AppColors {
   Color get textColorSecondary => isDark ? textColorSecondaryDark : textColorSecondaryLight;
   Color get greyColor => isDark ? greyColorDark : greyColorLight;
 
-  // Карточки и контейнеры
-  Color get cardColor => isDark ? cardColorDark : cardColorDark;
-  Color get cardColorLight => isDark ? cardColorLightDark : cardColorLightDark;
-  Color get cardColorDark => isDark ? cardColorDarker : cardColorDarker;
+  // Карточки и контейнеры (ВСЕГДА темные в обеих темах)
+  Color get cardColor => cardColorDark;  // Всегда темный
+  Color get cardColorLight => cardColorLightDark;  // Всегда темный светлый оттенок
+  Color get cardColorDark => cardColorDarker;  // Всегда самый темный
 
   // Специфичные цвета элементов
   Color get searchBarColor => isDark ? searchBarColorDark : searchBarColorLight;
@@ -126,6 +126,11 @@ class AppColors {
   Color get whiteCardColor => isDark ? Color.fromRGBO(245, 245, 245, 1) : Color.fromRGBO(18, 18, 18, 1);
   Color get whiteCardTextColor => isDark ? Color.fromRGBO(18, 18, 18, 1) : Color.fromRGBO(245, 245, 245, 1);
   Color get whiteCardSecondaryTextColor => isDark ? Color.fromRGBO(80, 80, 80, 1) : Color.fromRGBO(160, 160, 160, 1);
+  
+  // Цвета текста для карточек (ВСЕГДА светлые, так как карточки всегда темные)
+  Color get cardTextColor => textColorDark;  // Всегда светлый текст
+  Color get cardTextColorSecondary => textColorSecondaryDark;  // Всегда светлый вторичный текст
+  Color get cardGreyColor => greyColorDark;  // Всегда светлый серый
 }
 
 // ═══════════════════════════════════════════════════════════

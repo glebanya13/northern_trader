@@ -43,28 +43,38 @@ class FeedPostCard extends ConsumerWidget {
           child: ClipRect(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
               children: [
                 // Название канала вверху
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12.0, 10.0, 12.0, 6.0),
-                  child: Text(
-                    channel.name,
-                    style: TextStyle(
-                      color: colors.accentColor,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      height: 1.0,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.rss_feed_rounded,
+                        size: 14,
+                        color: colors.accentColor,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          channel.name,
+                          style: TextStyle(
+                            color: colors.accentColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 // Изображение (если есть)
                 if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
                   ClipRRect(
                     child: AspectRatio(
-                      aspectRatio: 2.0,
+                      aspectRatio: 2.2,
                       child: CachedNetworkImage(
                         imageUrl: post.imageUrl!,
                         width: double.infinity,
@@ -83,97 +93,78 @@ class FeedPostCard extends ConsumerWidget {
                           child: Icon(
                             Icons.image_not_supported,
                             size: 48,
-                            color: isDark ? colors.greyColor : greyColorDark,
+                            color: colors.cardGreyColor,
                           ),
                         ),
                       ),
                     ),
                   ),
                 // Контент поста
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Заголовок поста
-                        Text(
-                          post.title,
-                          style: TextStyle(
-                            color: isDark ? colors.textColor : textColorDark,
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                            height: 1.2,
-                            letterSpacing: -0.3,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Заголовок поста
+                      Text(
+                        post.title,
+                        style: TextStyle(
+                          color: colors.cardTextColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
+                          letterSpacing: -0.3,
                         ),
-                        const SizedBox(height: 4),
-                        // Превью контента
-                        if (_getContentPreview(post).isNotEmpty)
-                          Flexible(
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 10),
+                      // Дата и статистика
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.rss_feed_rounded,
+                            size: 14,
+                            color: colors.cardGreyColor,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
                             child: Text(
-                              _getContentPreview(post),
+                              channel.name,
                               style: TextStyle(
-                                color: isDark ? colors.textColorSecondary : textColorSecondaryDark,
-                                fontSize: 14,
-                                height: 1.3,
+                                color: colors.cardGreyColor,
+                                fontSize: 11,
                               ),
-                              maxLines: 2,
+                              maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        const SizedBox(height: 6),
-                        // Дата и статистика
-                        Row(
-                          children: [
-                            Text(
-                              _formatDate(post.createdAt),
-                              style: TextStyle(
-                                color: isDark ? colors.greyColor : greyColorDark,
-                                fontSize: 11,
-                                height: 1.0,
-                              ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _formatDate(post.createdAt),
+                            style: TextStyle(
+                              color: colors.cardGreyColor,
+                              fontSize: 11,
                             ),
-                            const SizedBox(width: 12),
-                            Icon(
-                              Icons.chat_bubble_outline,
-                              size: 14,
-                              color: isDark ? colors.greyColor : greyColorDark,
+                          ),
+                          const SizedBox(width: 12),
+                          Icon(
+                            Icons.visibility_outlined,
+                            size: 14,
+                            color: colors.cardGreyColor,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${post.views}',
+                            style: TextStyle(
+                              color: colors.cardGreyColor,
+                              fontSize: 11,
                             ),
-                            const SizedBox(width: 3),
-                            Text(
-                              '0',
-                              style: TextStyle(
-                                color: isDark ? colors.greyColor : greyColorDark,
-                                fontSize: 11,
-                                height: 1.0,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Icon(
-                              Icons.rocket_launch_outlined,
-                              size: 14,
-                              color: isDark ? colors.greyColor : greyColorDark,
-                            ),
-                            const SizedBox(width: 3),
-                            Flexible(
-                              child: Text(
-                                '${post.views}',
-                                style: TextStyle(
-                                  color: isDark ? colors.greyColor : greyColorDark,
-                                  fontSize: 11,
-                                  height: 1.0,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],

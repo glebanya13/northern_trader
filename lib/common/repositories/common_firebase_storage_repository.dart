@@ -24,24 +24,43 @@ class CommonFirebaseStorageRepository {
     if (kIsWeb) {
       Uint8List fileBytes;
       String? fileName;
+      String? contentType;
       
       if (file is XFile) {
         fileBytes = await file.readAsBytes();
         fileName = file.name;
+        contentType = _getContentType(ref, fileName);
       } else if (file is PlatformFile) {
-        fileBytes = file.bytes ?? Uint8List(0);
+        if (file.bytes == null) {
+          throw Exception('Файл не содержит данных (bytes is null)');
+        }
+        fileBytes = file.bytes!;
         fileName = file.name;
+        contentType = _getContentType(ref, fileName);
       } else {
         throw Exception('На веб-платформе требуется XFile или PlatformFile');
       }
       
+      if (fileBytes.isEmpty) {
+        throw Exception('Файл пустой');
+      }
+      
       uploadTask = firebaseStorage.ref().child(ref).putData(
         fileBytes,
-        SettableMetadata(contentType: _getContentType(ref, fileName)),
+        SettableMetadata(
+          contentType: contentType ?? 'application/octet-stream',
+          cacheControl: 'public, max-age=31536000',
+        ),
       );
     } else {
       if (file is File) {
-        uploadTask = firebaseStorage.ref().child(ref).putFile(file);
+        uploadTask = firebaseStorage.ref().child(ref).putFile(
+          file,
+          SettableMetadata(
+            contentType: _getContentType(ref, file.path),
+            cacheControl: 'public, max-age=31536000',
+          ),
+        );
       } else {
         throw Exception('На мобильных платформах требуется File');
       }
@@ -63,8 +82,13 @@ class CommonFirebaseStorageRepository {
     } else if (checkString.toLowerCase().endsWith('.gif')) {
       return 'image/gif';
     } else if (checkString.toLowerCase().endsWith('.mp4') ||
-               checkString.toLowerCase().endsWith('.mov') ||
-               checkString.contains('video')) {
+               (checkString.contains('video') && checkString.contains('mp4'))) {
+      return 'video/mp4';
+    } else if (checkString.toLowerCase().endsWith('.mov')) {
+      return 'video/quicktime';
+    } else if (checkString.toLowerCase().endsWith('.webm')) {
+      return 'video/webm';
+    } else if (checkString.contains('video')) {
       return 'video/mp4';
     } else if (checkString.toLowerCase().endsWith('.mp3') ||
                checkString.toLowerCase().endsWith('.aac') ||

@@ -97,10 +97,10 @@ class PostCard extends ConsumerWidget {
                               ),
                             ),
                             child: Icon(
-                              Icons.image_not_supported_outlined,
-                              size: 56,
-                              color: isDark ? colors.greyColor : greyColorDark,
-                            ),
+                            Icons.image_not_supported_outlined,
+                            size: 56,
+                            color: colors.cardGreyColor,
+                          ),
                           ),
                         ),
                       ),
@@ -206,7 +206,7 @@ class PostCard extends ConsumerWidget {
                                   Text(
                                     DateFormat('dd.MM.yyyy HH:mm').format(post.createdAt),
                                     style: TextStyle(
-                                      color: isDark ? colors.greyColor : greyColorDark,
+                                      color: colors.cardGreyColor,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                       height: 1.0,
@@ -222,7 +222,7 @@ class PostCard extends ConsumerWidget {
                       Text(
                         post.title,
                         style: TextStyle(
-                          color: isDark ? colors.textColor : textColorDark,
+                          color: colors.cardTextColor,
                           fontSize: titleFontSize,
                           fontWeight: FontWeight.bold,
                           height: compact ? 1.2 : 1.15,
@@ -272,7 +272,7 @@ class PostCard extends ConsumerWidget {
                                   Text(
                                     DateFormat('dd.MM.yyyy HH:mm').format(post.createdAt),
                                     style: TextStyle(
-                                      color: isDark ? colors.greyColor : greyColorDark,
+                                      color: colors.cardGreyColor,
                                       fontSize: compact ? 12 : 13,
                                       fontWeight: FontWeight.w500,
                                       height: 1.0,
@@ -356,7 +356,7 @@ class PostCard extends ConsumerWidget {
         return Text(
           controller.document.toPlainText(),
           style: TextStyle(
-            color: isDark ? colors.textColorSecondary : textColorSecondaryDark,
+            color: colors.cardTextColorSecondary,
             fontSize: fontSize,
             height: 1.25,
             letterSpacing: 0.2,
@@ -374,7 +374,7 @@ class PostCard extends ConsumerWidget {
       return Text(
         post.content.replaceAll(RegExp(r'[#*`>\-\[\]]+'), '').trim(),
         style: TextStyle(
-          color: isDark ? colors.textColorSecondary : textColorSecondaryDark,
+          color: colors.cardTextColorSecondary,
           fontSize: fontSize,
           height: 1.25,
           letterSpacing: 0.2,

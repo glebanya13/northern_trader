@@ -4,6 +4,11 @@ import 'package:northern_trader/features/auth/screens/login_screen.dart';
 import 'package:northern_trader/features/auth/screens/user_information_screen.dart';
 import 'package:northern_trader/features/chat/screens/mobile_chat_screen.dart';
 import 'package:northern_trader/features/feed/screens/post_detail_screen.dart';
+import 'package:northern_trader/features/feed/screens/all_posts_screen.dart';
+import 'package:northern_trader/features/reviews/screens/review_detail_screen.dart';
+import 'package:northern_trader/features/reviews/screens/create_review_screen.dart';
+import 'package:northern_trader/features/reviews/screens/edit_review_screen.dart';
+import 'package:northern_trader/models/review.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -35,6 +40,29 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => PostDetailScreen(
           post: post,
           channel: channel,
+        ),
+      );
+    case AllPostsScreen.routeName:
+      return MaterialPageRoute(
+        builder: (context) => const AllPostsScreen(),
+      );
+    case ReviewDetailScreen.routeName:
+      final arguments = settings.arguments as Map<String, dynamic>;
+      final review = arguments['review'] as Review;
+      return MaterialPageRoute(
+        builder: (context) => ReviewDetailScreen(
+          review: review,
+        ),
+      );
+    case CreateReviewScreen.routeName:
+      return MaterialPageRoute(
+        builder: (context) => const CreateReviewScreen(),
+      );
+    case EditReviewScreen.routeName:
+      final review = settings.arguments as Review;
+      return MaterialPageRoute(
+        builder: (context) => EditReviewScreen(
+          review: review,
         ),
       );
     default:

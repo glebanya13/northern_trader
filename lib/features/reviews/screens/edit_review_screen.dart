@@ -7,70 +7,62 @@ import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:dart_quill_delta/dart_quill_delta.dart' as delta;
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:uuid/uuid.dart';
 import 'package:northern_trader/common/utils/colors.dart';
 import 'package:northern_trader/common/providers/theme_provider.dart';
+import 'package:northern_trader/common/utils/utils.dart';
 import 'package:northern_trader/common/repositories/common_firebase_storage_repository.dart';
 import 'package:northern_trader/common/services/cloudinary_service.dart';
-import 'package:northern_trader/common/utils/utils.dart';
-import 'package:northern_trader/features/channels/controller/channels_controller.dart';
-import 'package:northern_trader/features/auth/controller/auth_controller.dart';
-import 'package:northern_trader/features/reviews/repository/reviews_repository.dart';
-import 'package:northern_trader/models/channel.dart';
-import 'package:northern_trader/models/channel_post.dart';
+import 'package:northern_trader/features/reviews/controller/reviews_controller.dart';
 import 'package:northern_trader/models/review.dart';
+import 'package:northern_trader/features/auth/controller/auth_controller.dart';
+import 'package:uuid/uuid.dart';
 
-class EditPostScreen extends ConsumerStatefulWidget {
-  final Channel channel;
-  final ChannelPost post;
+class EditReviewScreen extends ConsumerStatefulWidget {
+  static const String routeName = '/edit-review';
+  final Review review;
   
-  const EditPostScreen({
+  const EditReviewScreen({
     Key? key,
-    required this.channel,
-    required this.post,
+    required this.review,
   }) : super(key: key);
 
   @override
-  ConsumerState<EditPostScreen> createState() => _EditPostScreenState();
+  ConsumerState<EditReviewScreen> createState() => _EditReviewScreenState();
 }
 
-class _EditPostScreenState extends ConsumerState<EditPostScreen> {
+class _EditReviewScreenState extends ConsumerState<EditReviewScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _titleController;
   late final quill.QuillController _quillController;
   late final TextEditingController _imageUrlController;
+  late final TextEditingController _videoUrlController;
   bool _isLoading = false;
+  bool _isUploadingVideo = false;
   bool _isUploadingImage = false;
   bool _showEmojiPicker = false;
   final FocusNode _editorFocusNode = FocusNode();
-  late bool _showInFeed; // Флаг для показа в ленте
-  bool _duplicateToReviews = false; // Дублировать в обзоры
-  String _selectedCategory = 'market'; // Категория для обзора
-  Review? _existingReview; // Существующий обзор (если есть)
+  late String _selectedCategory;
 
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.post.title);
-    _imageUrlController = TextEditingController(text: widget.post.imageUrl ?? '');
-    _showInFeed = widget.post.showInFeed; // Инициализируем из существующего поста
-    
-    // Проверяем, есть ли связанный обзор
-    _checkExistingReview();
+    _titleController = TextEditingController(text: widget.review.title);
+    _imageUrlController = TextEditingController(text: widget.review.imageUrl ?? '');
+    _videoUrlController = TextEditingController(text: widget.review.videoUrl ?? '');
+    _selectedCategory = widget.review.category;
     
     // Инициализируем Quill контроллер с существующим контентом
-    if (widget.post.contentType == 'quill') {
+    if (widget.review.contentType == 'quill') {
       try {
-        final deltaJson = jsonDecode(widget.post.content) as List;
+        final deltaJson = jsonDecode(widget.review.content) as List;
         final document = quill.Document.fromJson(deltaJson);
         _quillController = quill.QuillController(
           document: document,
           selection: const TextSelection.collapsed(offset: 0),
         );
       } catch (e) {
-        // Если ошибка при загрузке, создаем документ с текстом
         _quillController = quill.QuillController.basic();
-        final text = widget.post.content;
+        final text = widget.review.content;
         if (text.isNotEmpty) {
           _quillController.document.compose(
             delta.Delta()..insert(text),
@@ -79,9 +71,8 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
         }
       }
     } else {
-      // Для markdown создаем документ с текстом
       _quillController = quill.QuillController.basic();
-      final text = widget.post.content;
+      final text = widget.review.content;
       if (text.isNotEmpty) {
         _quillController.document.compose(
           delta.Delta()..insert(text),
@@ -96,6 +87,7 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
     _titleController.dispose();
     _quillController.dispose();
     _imageUrlController.dispose();
+    _videoUrlController.dispose();
     _editorFocusNode.dispose();
     super.dispose();
   }
@@ -127,7 +119,7 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
             throw Exception('Пользователь не авторизован');
           }
           final imageId = const Uuid().v4();
-          final storageRef = 'posts/images/${userData.uid}/$imageId';
+          final storageRef = 'reviews/images/${userData.uid}/$imageId';
           final dartFile = File(file.path!);
           imageUrl = await ref
               .read(commonFirebaseStorageRepositoryProvider)
@@ -157,19 +149,78 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
     }
   }
 
-  Future<void> _updatePost() async {
+  Future<void> _pickVideoFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['mp4', 'mov', 'webm'],
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.single;
+        
+        // Проверяем наличие файла в зависимости от платформы
+        if (kIsWeb && file.bytes == null) {
+          throw Exception('Не удалось загрузить файл');
+        }
+        if (!kIsWeb && file.path == null) {
+          throw Exception('Не удалось загрузить файл');
+        }
+
+        setState(() {
+          _isUploadingVideo = true;
+        });
+
+        String? videoUrl;
+        
+        if (kIsWeb) {
+          // На веб используем Cloudinary
+          videoUrl = await CloudinaryService.uploadVideo(file);
+        } else {
+          // На мобильных используем Firebase Storage
+          final userData = ref.read(userDataAuthProvider).value;
+          if (userData == null) {
+            throw Exception('Пользователь не авторизован');
+          }
+          final videoId = const Uuid().v4();
+          final storageRef = 'reviews/videos/${userData.uid}/$videoId';
+          final dartFile = File(file.path!);
+          videoUrl = await ref
+              .read(commonFirebaseStorageRepositoryProvider)
+              .storeFileToFirebase(storageRef, dartFile);
+        }
+
+        if (videoUrl == null) {
+          throw Exception('Не удалось получить URL видео');
+        }
+
+        setState(() {
+          _videoUrlController.text = videoUrl!;
+          _isUploadingVideo = false;
+        });
+
+        if (mounted) {
+          showSnackBar(context: context, content: 'Видео успешно загружено');
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isUploadingVideo = false;
+      });
+      if (mounted) {
+        showSnackBar(context: context, content: 'Ошибка загрузки видео: $e');
+      }
+    }
+  }
+
+  Future<void> _updateReview() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     final plainText = _quillController.document.toPlainText().trim();
     if (plainText.isEmpty) {
-      showSnackBar(context: context, content: 'Введите содержание поста');
-      return;
-    }
-
-    if (widget.channel.id.isEmpty || widget.post.id.isEmpty) {
-      showSnackBar(context: context, content: 'Ошибка: ID канала или поста пустой');
+      showSnackBar(context: context, content: 'Введите содержание обзора');
       return;
     }
 
@@ -180,67 +231,24 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
     try {
       final deltaJson = jsonEncode(_quillController.document.toDelta().toJson());
       
-      // Обновляем пост
-      await ref.read(channelsControllerProvider).updatePost(
-        widget.channel.id,
-        widget.post.id,
-        {
-          'title': _titleController.text.trim(),
-          'content': deltaJson,
-          'contentType': 'quill',
-          'imageUrl': _imageUrlController.text.trim().isEmpty 
-              ? null 
-              : _imageUrlController.text.trim(),
-          'showInFeed': _showInFeed,
-        },
+      final updatedReview = widget.review.copyWith(
+        title: _titleController.text.trim(),
+        content: deltaJson,
+        contentType: 'quill',
+        imageUrl: _imageUrlController.text.trim().isEmpty 
+            ? null 
+            : _imageUrlController.text.trim(),
+        videoUrl: _videoUrlController.text.trim().isEmpty 
+            ? null 
+            : _videoUrlController.text.trim(),
+        category: _selectedCategory,
       );
       
-      // Обработка обзора
-      if (_duplicateToReviews) {
-        final user = await ref.read(authControllerProvider).getUserData();
-        if (user != null) {
-          if (_existingReview != null) {
-            // Обновляем существующий обзор
-            final updatedReview = _existingReview!.copyWith(
-              title: _titleController.text.trim(),
-              content: deltaJson,
-              contentType: 'quill',
-              imageUrl: _imageUrlController.text.trim().isEmpty 
-                  ? null 
-                  : _imageUrlController.text.trim(),
-              category: _selectedCategory,
-            );
-            await ref.read(reviewsRepositoryProvider).updateReview(updatedReview);
-          } else {
-            // Создаем новый обзор
-            final review = Review(
-              id: const Uuid().v4(),
-              title: _titleController.text.trim(),
-              content: deltaJson,
-              contentType: 'quill',
-              imageUrl: _imageUrlController.text.trim().isEmpty 
-                  ? null 
-                  : _imageUrlController.text.trim(),
-              category: _selectedCategory,
-              tags: [],
-              createdAt: DateTime.now(),
-              views: 0,
-              authorId: user.uid,
-              authorName: user.name,
-              sourcePostId: widget.post.id,
-              sourceChannelId: widget.channel.id,
-            );
-            await ref.read(reviewsRepositoryProvider).createReview(review);
-          }
-        }
-      } else if (_existingReview != null) {
-        // Если чекбокс выключен, но обзор существует - удаляем его
-        await ref.read(reviewsRepositoryProvider).deleteReview(_existingReview!.id);
-      }
+      await ref.read(reviewsControllerProvider).updateReview(updatedReview);
       
       if (mounted) {
         Navigator.pop(context);
-        showSnackBar(context: context, content: 'Пост обновлен');
+        showSnackBar(context: context, content: 'Обзор обновлен');
       }
     } catch (e) {
       if (mounted) {
@@ -255,25 +263,6 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
     }
   }
 
-  // Проверяем, существует ли обзор для этого поста
-  Future<void> _checkExistingReview() async {
-    try {
-      final review = await ref
-          .read(reviewsRepositoryProvider)
-          .getReviewBySourcePost(widget.post.id);
-      
-      if (review != null && mounted) {
-        setState(() {
-          _existingReview = review;
-          _duplicateToReviews = true;
-          _selectedCategory = review.category;
-        });
-      }
-    } catch (e) {
-      // Игнорируем ошибки
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
@@ -285,7 +274,7 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
         backgroundColor: colors.appBarColor,
         elevation: 0,
         title: Text(
-          'Редактировать пост',
+          'Редактировать обзор',
           style: TextStyle(color: colors.textColor, fontWeight: FontWeight.bold),
         ),
         iconTheme: IconThemeData(color: colors.textColor),
@@ -299,44 +288,100 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 12),
-              Text(
-                'Канал: ${widget.channel.name}',
-                style: TextStyle(
-                  color: colors.textColorSecondary,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _titleController,
                 style: TextStyle(color: colors.textColor),
                 decoration: InputDecoration(
-                  labelText: 'Заголовок поста',
+                  labelText: 'Заголовок обзора',
                   labelStyle: TextStyle(color: colors.greyColor),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: colors.dividerColor, width: 1.5),
+                    borderSide: BorderSide(color: colors.dividerColor),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: colors.dividerColor, width: 1.5),
+                    borderSide: BorderSide(color: colors.dividerColor),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: colors.accentColor, width: 2.5),
+                    borderSide: BorderSide(color: colors.accentColor, width: 2),
                   ),
                   fillColor: colors.inputColor,
                   filled: true,
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Введите заголовок поста';
+                    return 'Введите заголовок обзора';
                   }
                   return null;
                 },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
+              // Выбор категории
+              Container(
+                decoration: BoxDecoration(
+                  color: colors.inputColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: colors.dividerColor,
+                    width: 1.5,
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Категория обзора',
+                      style: TextStyle(
+                        color: colors.greyColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: _selectedCategory,
+                      dropdownColor: colors.inputColor,
+                      style: TextStyle(color: colors.textColor),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: colors.dividerColor),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: colors.dividerColor),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: colors.accentColor, width: 2),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        fillColor: colors.backgroundColor,
+                        filled: true,
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'market', child: Text('📊 Обзор рынка')),
+                        DropdownMenuItem(value: 'technical', child: Text('📈 Технический анализ')),
+                        DropdownMenuItem(value: 'fundamental', child: Text('📰 Фундаментальный анализ')),
+                        DropdownMenuItem(value: 'strategy', child: Text('🎯 Торговая стратегия')),
+                        DropdownMenuItem(value: 'education', child: Text('📚 Обучающий материал')),
+                        DropdownMenuItem(value: 'news', child: Text('⚡ Новости и события')),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            _selectedCategory = value;
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
               Text(
                 'Содержание',
                 style: TextStyle(
@@ -345,15 +390,15 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Container(
                 decoration: BoxDecoration(
                   color: colors.inputColor,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                   border: Border(
-                    top: BorderSide(color: colors.dividerColor, width: 1.5),
-                    left: BorderSide(color: colors.dividerColor, width: 1.5),
-                    right: BorderSide(color: colors.dividerColor, width: 1.5),
+                    top: BorderSide(color: colors.dividerColor),
+                    left: BorderSide(color: colors.dividerColor),
+                    right: BorderSide(color: colors.dividerColor),
                   ),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -465,7 +510,7 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
                 decoration: BoxDecoration(
                   color: colors.inputColor,
                   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
-                  border: Border.all(color: colors.dividerColor, width: 1.5),
+                  border: Border.all(color: colors.dividerColor),
                 ),
                 padding: const EdgeInsets.all(16),
                 child: Theme(
@@ -490,7 +535,7 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
                   decoration: BoxDecoration(
                     color: colors.inputColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: colors.dividerColor, width: 1.5),
+                    border: Border.all(color: colors.dividerColor),
                   ),
                   child: EmojiPicker(
                     onEmojiSelected: (category, emoji) {
@@ -514,19 +559,19 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
                     config: const Config(
                       height: 300,
                       checkPlatformCompatibility: true,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
               Text(
-                'Изображение',
+                'Превью изображение',
                 style: TextStyle(
                   color: colors.greyColor,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -541,15 +586,15 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
                         hintStyle: TextStyle(color: colors.greyColor.withOpacity(0.6)),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: colors.dividerColor, width: 1.5),
+                          borderSide: BorderSide(color: colors.dividerColor),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: colors.dividerColor, width: 1.5),
+                          borderSide: BorderSide(color: colors.dividerColor),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: colors.accentColor, width: 2.5),
+                          borderSide: BorderSide(color: colors.accentColor, width: 2),
                         ),
                         fillColor: colors.inputColor,
                         filled: true,
@@ -599,183 +644,103 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Загрузите изображение с ПК или вставьте URL',
+                'Используется как превью для видео. Показывается только если видео отсутствует.',
                 style: TextStyle(
                   color: colors.greyColor,
                   fontSize: 12,
                 ),
               ),
-              // Чекбокс для выбора показа в ленте (только для админов)
-              FutureBuilder(
-                future: ref.read(authControllerProvider).getUserData(),
-                builder: (context, snapshot) {
-                  final user = snapshot.data;
-                  if (user == null || !user.isOwner) {
-                    return const SizedBox.shrink();
-                  }
-                  
-                  return Column(
-                    children: [
-                      const SizedBox(height: 16),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: colors.inputColor.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: colors.dividerColor,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: CheckboxListTile(
-                          title: Text(
-                            'Показывать в общей ленте',
-                            style: TextStyle(
-                              color: colors.textColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          subtitle: Text(
-                            _showInFeed 
-                                ? 'Пост будет виден во вкладке "Лента" и в канале'
-                                : 'Пост будет виден только в этом канале',
-                            style: TextStyle(
-                              color: colors.textColorSecondary,
-                              fontSize: 13,
-                            ),
-                          ),
-                          value: _showInFeed,
-                          activeColor: colors.accentColor,
-                          checkColor: colors.isDark ? blackColor : whiteColor,
-                          onChanged: (value) {
-                            setState(() {
-                              _showInFeed = value ?? true;
-                            });
-                          },
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                        ),
-                      ),
-                      // Чекбокс для дублирования в обзоры
-                      const SizedBox(height: 16),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: colors.inputColor.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: colors.dividerColor,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: CheckboxListTile(
-                          title: Text(
-                            'Дублировать в обзоры',
-                            style: TextStyle(
-                              color: colors.textColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          subtitle: Text(
-                            _duplicateToReviews 
-                                ? _existingReview != null
-                                    ? 'Обзор будет обновлен при сохранении'
-                                    : 'Будет создан новый обзор'
-                                : _existingReview != null
-                                    ? 'Существующий обзор будет удален'
-                                    : 'Пост не будет добавлен в раздел обзоров',
-                            style: TextStyle(
-                              color: colors.textColorSecondary,
-                              fontSize: 13,
-                            ),
-                          ),
-                          value: _duplicateToReviews,
-                          activeColor: colors.accentColor,
-                          checkColor: colors.isDark ? blackColor : whiteColor,
-                          onChanged: (value) {
-                            setState(() {
-                              _duplicateToReviews = value ?? false;
-                            });
-                          },
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                        ),
-                      ),
-                      // Выбор категории обзора (показывается только если включено дублирование)
-                      if (_duplicateToReviews) ...[
-                        const SizedBox(height: 16),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: colors.inputColor,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: colors.dividerColor,
-                              width: 1.5,
-                            ),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Категория обзора',
-                                style: TextStyle(
-                                  color: colors.greyColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              DropdownButtonFormField<String>(
-                                value: _selectedCategory,
-                                dropdownColor: colors.inputColor,
-                                style: TextStyle(color: colors.textColor),
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(color: colors.dividerColor),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(color: colors.dividerColor),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(color: colors.accentColor, width: 2),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  fillColor: colors.backgroundColor,
-                                  filled: true,
-                                ),
-                                items: const [
-                                  DropdownMenuItem(value: 'market', child: Text('📊 Обзор рынка')),
-                                  DropdownMenuItem(value: 'technical', child: Text('📈 Технический анализ')),
-                                  DropdownMenuItem(value: 'fundamental', child: Text('📰 Фундаментальный анализ')),
-                                  DropdownMenuItem(value: 'strategy', child: Text('🎯 Торговая стратегия')),
-                                  DropdownMenuItem(value: 'education', child: Text('📚 Обучающий материал')),
-                                  DropdownMenuItem(value: 'news', child: Text('⚡ Новости и события')),
-                                ],
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      _selectedCategory = value;
-                                    });
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  );
-                },
+              const SizedBox(height: 20),
+              Text(
+                'Видео',
+                style: TextStyle(
+                  color: colors.greyColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _videoUrlController,
+                      style: TextStyle(color: colors.textColor),
+                      decoration: InputDecoration(
+                        labelText: 'URL видео (YouTube, Vimeo)',
+                        labelStyle: TextStyle(color: colors.greyColor),
+                        hintText: 'https://youtube.com/watch?v=...',
+                        hintStyle: TextStyle(color: colors.greyColor.withOpacity(0.6)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: colors.dividerColor),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: colors.dividerColor),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: colors.accentColor, width: 2),
+                        ),
+                        fillColor: colors.inputColor,
+                        filled: true,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  _isUploadingVideo
+                      ? Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.green, width: 2),
+                          ),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ),
+                        )
+                      : InkWell(
+                          onTap: _pickVideoFile,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: Colors.green.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.green, width: 2),
+                            ),
+                            child: const Icon(
+                              Icons.video_library,
+                              color: Colors.green,
+                              size: 32,
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Или загрузите видео файл с вашего устройства (mp4, mov, webm)',
+                style: TextStyle(
+                  color: colors.greyColor,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 40),
               ElevatedButton(
-                onPressed: _isLoading ? null : _updatePost,
+                onPressed: _isLoading ? null : _updateReview,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colors.accentColor,
                   minimumSize: const Size(double.infinity, 50),
@@ -809,4 +774,3 @@ class _EditPostScreenState extends ConsumerState<EditPostScreen> {
     );
   }
 }
-

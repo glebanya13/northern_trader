@@ -35,7 +35,10 @@ class FeedRepository {
           for (var postDoc in postsSnapshot.docs) {
             try {
               final post = ChannelPost.fromMap(postDoc.data());
-              allPosts.add(FeedPost(post: post, channel: channel));
+              // Фильтруем только посты с showInFeed = true
+              if (post.showInFeed) {
+                allPosts.add(FeedPost(post: post, channel: channel));
+              }
             } catch (e) {
             }
           }
@@ -72,7 +75,10 @@ class FeedRepository {
           for (var postDoc in postsSnapshot.docs) {
             try {
               final post = ChannelPost.fromMap(postDoc.data());
-              allPosts.add(FeedPost(post: post, channel: channel));
+              // Фильтруем только посты с showInFeed = true
+              if (post.showInFeed) {
+                allPosts.add(FeedPost(post: post, channel: channel));
+              }
             } catch (e) {
             }
           }

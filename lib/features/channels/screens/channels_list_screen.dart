@@ -97,6 +97,7 @@ class _ChannelsListScreenState extends ConsumerState<ChannelsListScreen> {
                       ],
                     ),
                     child: FloatingActionButton(
+                      heroTag: 'create_channel_fab_desktop',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -201,6 +202,7 @@ class _ChannelsListScreenState extends ConsumerState<ChannelsListScreen> {
                     ],
                   ),
                   child: FloatingActionButton(
+                    heroTag: 'create_channel_fab_mobile',
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -270,11 +272,11 @@ class _ChannelCard extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: colors.cardColor,
+        backgroundColor: isDark ? colors.cardColor : cardColorLight,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
-            color: limeGreen.withOpacity(0.2),
+            color: colors.accentColor.withOpacity(0.2),
             width: 1.5,
           ),
         ),
@@ -297,7 +299,7 @@ class _ChannelCard extends ConsumerWidget {
               child: Text(
                 'Удалить канал?',
                 style: TextStyle(
-                  color: colors.textColor,
+                  color: isDark ? colors.cardTextColor : textColorLight,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -308,7 +310,7 @@ class _ChannelCard extends ConsumerWidget {
         content: Text(
           'Вы уверены, что хотите удалить этот канал? Это действие нельзя отменить. Канал можно удалить только если в нем нет постов.',
           style: TextStyle(
-            color: colors.textColorSecondary,
+            color: isDark ? colors.cardTextColorSecondary : textColorSecondaryLight,
             fontSize: 15,
             height: 1.5,
           ),
@@ -322,7 +324,7 @@ class _ChannelCard extends ConsumerWidget {
             child: Text(
               'Отмена',
               style: TextStyle(
-                color: colors.textColorSecondary,
+                color: isDark ? colors.cardTextColorSecondary : textColorSecondaryLight,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -491,7 +493,7 @@ class _ChannelCard extends ConsumerWidget {
                     Text(
                       channel.name,
                       style: TextStyle(
-                        color: isDark ? colors.textColor : textColorDark,
+                        color: colors.cardTextColor,
                         fontSize: isMobile ? 18 : 17,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.3,
@@ -503,7 +505,7 @@ class _ChannelCard extends ConsumerWidget {
                     Text(
                       channel.description,
                       style: TextStyle(
-                        color: isDark ? colors.textColorSecondary : textColorSecondaryDark,
+                        color: colors.cardTextColorSecondary,
                         fontSize: isMobile ? 14 : 13,
                         height: 1.4,
                         letterSpacing: 0.1,
