@@ -80,9 +80,9 @@ northern-trader/
 ## 📸 Screenshots
 
 <div>
-  <img src="https://github.com/user-attachments/assets/d22b774d-f6b0-4721-a014-2b2996d6c56b" alt="Экран 1" width="275"/>
-  <img src="https://github.com/user-attachments/assets/200b0051-ac8e-4129-a8f5-fae1082df91a" alt="Экран 2" width="275"/>
-  <img src="https://github.com/user-attachments/assets/ee9b7ea3-4c54-49f8-af44-ead04a4c6cb9" alt="Экран 3" width="275"/>
+  <img src="https://github.com/user-attachments/assets/d22b774d-f6b0-4721-a014-2b2996d6c56b" alt="Экран 1" width="250"/>
+  <img src="https://github.com/user-attachments/assets/200b0051-ac8e-4129-a8f5-fae1082df91a" alt="Экран 2" width="250"/>
+  <img src="https://github.com/user-attachments/assets/ee9b7ea3-4c54-49f8-af44-ead04a4c6cb9" alt="Экран 3" width="250"/>
 </div>
 
 ## 🤝 Contributing
