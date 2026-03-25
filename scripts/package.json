@@ -1,0 +1,9 @@
+{
+  "name": "northern-trader-scripts",
+  "private": true,
+  "type": "module",
+  "description": "Скрипты для создания админа и т.п.",
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}

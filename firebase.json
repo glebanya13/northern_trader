@@ -1,0 +1,58 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "functions": {
+    "source": "functions"
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "redirects": [
+      {
+        "source": "/oferta",
+        "destination": "/landing/oferta",
+        "type": 301
+      },
+      {
+        "source": "/oferta/**",
+        "destination": "/landing/oferta",
+        "type": 301
+      },
+      {
+        "source": "/politika",
+        "destination": "/landing/politika",
+        "type": 301
+      },
+      {
+        "source": "/politika/**",
+        "destination": "/landing/politika",
+        "type": 301
+      },
+      {
+        "source": "/risks",
+        "destination": "/landing/risks",
+        "type": 301
+      },
+      {
+        "source": "/risks/**",
+        "destination": "/landing/risks",
+        "type": 301
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/api/lead",
+        "function": "leadForm"
+      },
+      {
+        "source": "/landing/**",
+        "destination": "/landing/index.html"
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ВРЕМЕННО: открытый доступ, чтобы сайт работал (токен Auth на web не подхватывается).
+    // Когда починим передачу токена — вернуть: allow read, write: if request.auth != null;
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

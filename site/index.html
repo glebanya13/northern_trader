@@ -1,0 +1,956 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Volume Trading PRO 2026 — Trader's University</title>
+    <meta
+      name="description"
+      content="Volume Trading PRO 2026 — практическое обучение объёмному анализу от команды Trader's University (14 лет практики). Реальные сделки и открытая статистика в Telegram. Системность, дисциплина и риск-менеджмент вместо догадок."
+    />
+
+    <link rel="icon" href="./favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <meta name="theme-color" content="#0a0a0a" />
+
+    <link rel="stylesheet" href="./assets/styles.css?v=8" />
+  </head>
+  <body class="bg-black text-white overflow-x-hidden">
+    <div class="noise-overlay"></div>
+
+    <!-- Navigation (static) -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black backdrop-blur-md py-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 flex items-center justify-between">
+        <a
+          href="#hero"
+          class="text-h6 font-medium text-white hover:text-highlight transition-colors duration-300"
+        >
+          Trader's University
+        </a>
+        <div class="hidden sm:flex items-center gap-6 sm:gap-10 flex-wrap justify-end">
+          <a
+            href="#services"
+            class="text-body text-white/70 hover:text-white transition-colors duration-300"
+            >Программа</a
+          >
+          <a
+            href="#channels"
+            class="text-body text-white/70 hover:text-white transition-colors duration-300"
+            >Сделки в Telegram</a
+          >
+          <a
+            href="#works"
+            class="text-body text-white/70 hover:text-white transition-colors duration-300"
+            >Результаты</a
+          >
+          <a
+            href="#pricing"
+            class="text-body text-white/70 hover:text-white transition-colors duration-300"
+            >Тарифы</a
+          >
+          <a
+            href="#testimonials"
+            class="text-body text-white/70 hover:text-white transition-colors duration-300"
+            >Отзывы выпускников</a
+          >
+          <a
+            href="#faq"
+            class="text-body text-white/70 hover:text-white transition-colors duration-300"
+            >FAQ</a
+          >
+          <a
+            href="#contact"
+            class="text-body text-white/70 hover:text-white transition-colors duration-300"
+            >Контакты</a
+          >
+        </div>
+
+        <!-- Burger menu (mobile only) -->
+        <div id="mobile-menu-wrapper" class="relative" style="display: none;">
+          <button
+            id="mobile-menu-toggle"
+            type="button"
+            aria-controls="mobile-menu"
+            aria-expanded="false"
+            class="cursor-pointer flex items-center justify-center w-11 h-11 rounded-lg bg-white/5 hover:bg-white/10 transition-colors duration-300 text-white"
+          >
+            <span class="sr-only">Открыть меню</span>
+            <!-- Hamburger icon -->
+            <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M4 7H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <path d="M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <path d="M4 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </button>
+
+        <div
+            id="mobile-menu"
+            class="hidden fixed left-0 right-0 top-16 border-t border-white/10 p-6 flex flex-col gap-4 rounded-none"
+            style="background: #000; z-index: 9999;"
+          >
+            <a
+              href="#services"
+              class="text-body-lg text-white/80 hover:text-white transition-colors duration-300"
+              >Программа</a
+            >
+            <a
+              href="#channels"
+              class="text-body-lg text-white/80 hover:text-white transition-colors duration-300"
+              >Сделки в Telegram</a
+            >
+            <a
+              href="#works"
+              class="text-body-lg text-white/80 hover:text-white transition-colors duration-300"
+              >Результаты</a
+            >
+            <a
+              href="#pricing"
+              class="text-body-lg text-white/80 hover:text-white transition-colors duration-300"
+              >Тарифы</a
+            >
+            <a
+              href="#testimonials"
+              class="text-body-lg text-white/80 hover:text-white transition-colors duration-300"
+              >Отзывы выпускников</a
+            >
+            <a href="#faq" class="text-body-lg text-white/80 hover:text-white transition-colors duration-300"
+              >FAQ</a
+            >
+            <a
+              href="#contact"
+              class="text-body-lg text-white/80 hover:text-white transition-colors duration-300"
+              >Контакты</a
+            >
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <section id="hero" class="relative min-h-screen w-full overflow-hidden perspective-container">
+      <div
+        class="absolute inset-0 z-10 pointer-events-none"
+        style="background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);"
+      ></div>
+      <div class="absolute inset-0 z-0">
+        <img src="./hero-bg.jpg" alt="Hero" class="w-full h-full object-contain" style="filter: brightness(0.9);" />
+      </div>
+
+      <div class="relative z-20 h-full w-full flex flex-col justify-center items-center px-4 sm:px-8">
+        <h1
+          class="w-full text-center mx-auto text-[32px] sm:text-[42px] md:text-[67px] lg:text-[87px] font-medium text-white tracking-tight mb-3 leading-none md:whitespace-nowrap"
+          style="text-shadow: 0 0 80px rgba(234, 0, 0, 0.3);"
+        >
+          Volume Trading PRO 2026
+        </h1>
+        <div class="hero-subline-wrap mt-7">
+          <p
+            class="hero-subline text-center text-[16px] sm:text-[20px] md:text-h5 lg:text-h4 font-extralight text-white/80 leading-snug sm:leading-normal"
+          >
+            Обучение объёмному анализу, которое превращает трейдинг в понятную систему
+          </p>
+        </div>
+        <p class="mt-5 text-center text-body text-white/70">
+          Старт потока: <strong class="text-white">15.04.2026</strong> · 14 лет практики · Объёмы + фундамент
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+          <a
+            href="#channels"
+            class="inline-flex items-center justify-center px-8 py-4 bg-white text-black text-body font-medium hover:bg-highlight hover:text-white transition-colors duration-300"
+            >Посмотреть сделки в Telegram</a
+          >
+          <a
+            href="#contact"
+            class="inline-flex items-center justify-center px-8 py-4 bg-white/10 text-white text-body font-medium border border-white/20 hover:bg-white/15 transition-colors duration-300"
+            >Получить консультацию</a
+          >
+        </div>
+        <p class="hero-proofline mt-6 text-center text-body-sm text-white/50 max-w-2xl">
+          Ежедневно публикую реальные сделки в Telegram. Можно зайти и всё проверить самому.
+        </p>
+        <div
+          class="absolute left-1/2 bottom-32 w-px bg-highlight z-30"
+          style="transform: translateX(-50%); height: 200px;"
+        ></div>
+      </div>
+
+      <div class="absolute left-4 sm:left-8 bottom-24 sm:bottom-32 z-30 flex flex-col items-center gap-4" style="writing-mode: vertical-rl; text-orientation: mixed;">
+        <span class="text-body-sm text-white/60 tracking-widest">Анализируй · Действуй · Зарабатывай</span>
+      </div>
+      <div class="absolute right-4 sm:right-8 bottom-4 sm:bottom-8 z-30">
+        <span class="text-body-sm text-white/40">© 2026 Trader's University</span>
+      </div>
+    </section>
+
+    <!-- Story -->
+    <section id="story" class="relative py-32 px-4 sm:px-8 lg:px-16 overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-b from-black via-[#0a0a0a] to-black z-0"></div>
+      <div class="relative z-10 max-w-3xl mx-auto">
+
+        <!-- 1 — Стабильность -->
+        <div class="mb-20">
+          <p class="text-body-sm text-white/40 tracking-widest mb-8">О нас и нашем подходе</p>
+          <h2 class="text-h3 md:text-h2 text-white font-medium leading-tight mb-10">
+            Стабильность — это и есть основа успешного трейдинга
+          </h2>
+          <p class="text-body-lg text-white/70 leading-relaxed mb-6">
+            Каждый день команда публикует сделки в Telegram-каналах. Как правило, 90% сделок отрабатывают с высокой точностью. Если внимательно посмотреть каналы, можно увидеть всю статистику и понять главное: мы стабильно зарабатываем на дистанции.
+          </p>
+        </div>
+
+        <div class="h-px bg-white/10 mb-20"></div>
+
+        <!-- 2 — Метод -->
+        <div class="mb-20">
+          <h3 class="text-h4 md:text-h3 text-white font-medium leading-tight mb-8">В чём секрет?</h3>
+          <p class="text-body-lg text-white/70 leading-relaxed mb-6">
+            Всё строится на правильной интерпретации объёмов. <strong class="text-white">Объёмы = деньги.</strong> А деньги — это единственное, что действительно двигает рынок. За 14 лет практики команда выработала навык, который позволяет заходить в сделки с ювелирной точностью, иногда буквально до пункта.
+          </p>
+          <p class="text-body-lg text-white/70 leading-relaxed mb-6">
+            Это уже не классический теханализ и не отработка устаревших паттернов. Это реальное понимание того, как рынок движется сейчас.
+          </p>
+          <p class="text-body-lg text-white/70 leading-relaxed">
+            Если посмотреть на рынок информации — большинство либо показывает результаты постфактум, либо торгует по шаблонам, которые давно перестали работать. Мы же — команда практиков, которая работает в реальном времени и показывает результат на дистанции.
+          </p>
+        </div>
+
+        <div class="h-px bg-white/10 mb-20"></div>
+
+        <!-- 3 — Философия -->
+        <div class="mb-20">
+          <h3 class="text-h4 md:text-h3 text-white font-medium leading-tight mb-8">Важно понимать</h3>
+          <p class="text-body-lg text-white/70 leading-relaxed mb-6">
+            Успешный трейдинг — это не просто сделки. Это навык. Это психология, дисциплина, риск-менеджмент, следование своей торговой системе.
+          </p>
+          <p class="text-body-lg text-white/70 leading-relaxed mb-6">
+            По сути, стать трейдером — это изменить мышление и сформировать новый характер. Это как научиться водить машину или говорить на английском: один раз освоил — и этот навык остаётся с тобой на всю жизнь.
+          </p>
+          <p class="text-body-lg text-white/70 leading-relaxed">
+            Именно этому мы обучаем на курсе <strong class="text-white">Volume Trading Pro 2026</strong>, старт которого — <strong class="text-white">15.04.2026</strong>.
+          </p>
+        </div>
+
+        <div class="h-px bg-white/10 mb-20"></div>
+
+        <!-- 4 — Курс -->
+        <div>
+          <h3 class="text-h4 md:text-h3 text-white font-medium leading-tight mb-6">
+            На курсе передаём весь опыт, накопленный за 14 лет торговли
+          </h3>
+          <p class="text-body-lg text-white/70 leading-relaxed mb-12">
+            И доводим каждого ученика до положительного результата.
+          </p>
+
+          <p class="text-body-sm text-white/40 tracking-widest mb-6">После обучения у тебя появится</p>
+          <ul class="space-y-5 mb-12">
+            <li class="flex items-start gap-4">
+              <span class="text-highlight font-medium shrink-0 mt-1">—</span>
+              <span class="text-body-lg text-white/80 leading-relaxed">Глубокое понимание движения цены</span>
+            </li>
+            <li class="flex items-start gap-4">
+              <span class="text-highlight font-medium shrink-0 mt-1">—</span>
+              <span class="text-body-lg text-white/80 leading-relaxed">Осознанный подход к трейдингу без эмоций</span>
+            </li>
+            <li class="flex items-start gap-4">
+              <span class="text-highlight font-medium shrink-0 mt-1">—</span>
+              <span class="text-body-lg text-white/80 leading-relaxed">Собственный торговый алгоритм</span>
+            </li>
+            <li class="flex items-start gap-4">
+              <span class="text-highlight font-medium shrink-0 mt-1">—</span>
+              <span class="text-body-lg text-white/80 leading-relaxed">Навык, который будет приносить доход на протяжении всей жизни</span>
+            </li>
+          </ul>
+
+          <p class="text-body-lg text-white/70 leading-relaxed mb-6">
+            Курс без воды. Только то, что действительно работает на рынке сейчас. Без абстрактных теорий, без индикаторов и устаревших подходов. Основной акцент — объёмы и фундамент.
+          </p>
+          <p class="text-body-lg text-white/70 leading-relaxed mb-12">
+            Дополнительно во время обучения ты попадаешь в закрытый чат учеников, где находятся как участники текущего потока, так и выпускники прошлых. Там ты будешь оттачивать навыки на практике и развиваться в среде единомышленников. По итогу курса у тебя будет собственная торговая система, которую ты выстроишь под себя. Потому что каждый трейдер индивидуален.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a
+              href="#services"
+              class="inline-flex items-center justify-center px-8 py-4 bg-white text-black text-body font-medium hover:bg-highlight hover:text-white transition-colors duration-300"
+              >Смотреть программу</a
+            >
+            <a
+              href="#pricing"
+              class="inline-flex items-center justify-center px-8 py-4 bg-white/10 text-white text-body font-medium border border-white/20 hover:bg-white/15 transition-colors duration-300"
+              >Выбрать тариф</a
+            >
+          </div>
+        </div>
+
+        <p class="mt-16 text-body-sm text-white/30">
+          Трейдинг связан с рисками. Ознакомьтесь с <a href="./risks/" class="underline underline-offset-4 hover:text-white/60 transition-colors">уведомлением о рисках</a>.
+        </p>
+      </div>
+    </section>
+
+
+    <!-- How we trade in reality -->
+    <section id="channels" class="relative py-32 px-4 sm:px-8 lg:px-16 overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-b from-black via-[#0a0a0a] to-black z-0"></div>
+      <div class="relative z-10 max-w-7xl mx-auto">
+        <div class="mb-16 max-w-3xl">
+          <p class="text-body-sm text-white/40 tracking-widest mb-6">Наши Telegram-каналы</p>
+          <h2 class="text-h3 md:text-h2 text-white font-medium leading-tight mb-8">Хочешь посмотреть, как мы торгуем на практике?</h2>
+          <p class="text-body-lg text-white/70 leading-relaxed mb-10">
+            Подпишитесь на наши Telegram-каналы и понаблюдайте за торговлей в режиме онлайн. Ежедневно — реальные сделки, логика входа и открытая статистика. Можно зайти и всё проверить самому.
+          </p>
+          <a
+            href="https://t.me/addlist/xCzKIuCnQbtiNDBi"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center justify-center px-8 py-4 bg-white text-black text-body font-medium hover:bg-highlight hover:text-white transition-colors duration-300"
+            >Получить ссылки на каналы</a
+          >
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <!-- 1. Валютный рынок -->
+          <div class="group">
+            <a href="https://t.me/tradingplusforex" target="_blank" rel="noopener noreferrer" class="block relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+              <div class="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-highlight"></div>
+              <div class="pointer-events-none absolute inset-0 rounded-xl group-hover:shadow-[0_0_15px_var(--highlight)] transition-shadow duration-300"></div>
+              <div class="p-6">
+                <div class="relative rounded-lg border border-white/20 bg-white overflow-hidden">
+                  <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-highlight/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div class="aspect-square w-full flex items-center justify-center p-6">
+                    <img src="./ch-tradingplusforex.png" alt="Валютный рынок" class="w-full h-full object-contain transition-all duration-500 group-hover:scale-105 group-hover:brightness-110" />
+                  </div>
+                </div>
+                <h3 class="mt-5 px-1 text-white font-semibold text-base leading-tight group-hover:text-highlight transition-colors duration-300">
+                  Валютный рынок
+                </h3>
+                <p class="mt-3 px-1 text-body-sm text-white/60 leading-relaxed">
+                  Реальные сделки и сценарии по FX: точки входа, риск и сопровождение — без «постфактума».
+                </p>
+              </div>
+            </a>
+          </div>
+
+          <!-- 2. Срочный рынок -->
+          <div class="group">
+            <a href="https://t.me/Exper_Trading" target="_blank" rel="noopener noreferrer" class="block relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+              <div class="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-highlight"></div>
+              <div class="pointer-events-none absolute inset-0 rounded-xl group-hover:shadow-[0_0_15px_var(--highlight)] transition-shadow duration-300"></div>
+              <div class="p-6">
+                <div class="relative rounded-lg border border-white/20 bg-white overflow-hidden">
+                  <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-highlight/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div class="aspect-square w-full flex items-center justify-center p-6">
+                    <img src="./ch-expert.png" alt="Срочный рынок" class="w-full h-full object-contain transition-all duration-500 group-hover:scale-105 group-hover:brightness-110" />
+                  </div>
+                </div>
+                <h3 class="mt-5 px-1 text-white font-semibold text-base leading-tight group-hover:text-highlight transition-colors duration-300">
+                  Срочный рынок
+                </h3>
+                <p class="mt-3 px-1 text-body-sm text-white/60 leading-relaxed">
+                  Фьючерсы и индексы: объёмы, уровни ликвидности и план сделки. Статистика и результаты — открыто.
+                </p>
+              </div>
+            </a>
+          </div>
+
+          <!-- 3. Крипторынок -->
+          <div class="group">
+            <a href="https://t.me/QuantumTradingPRO" target="_blank" rel="noopener noreferrer" class="block relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+              <div class="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-highlight"></div>
+              <div class="pointer-events-none absolute inset-0 rounded-xl group-hover:shadow-[0_0_15px_var(--highlight)] transition-shadow duration-300"></div>
+              <div class="p-6">
+                <div class="relative rounded-lg border border-white/20 bg-white overflow-hidden">
+                  <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-highlight/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div class="aspect-square w-full flex items-center justify-center p-6">
+                    <img src="./ch-quantum.png" alt="Крипторынок" class="w-full h-full object-contain transition-all duration-500 group-hover:scale-105 group-hover:brightness-110" />
+                  </div>
+                </div>
+                <h3 class="mt-5 px-1 text-white font-semibold text-base leading-tight group-hover:text-highlight transition-colors duration-300">
+                  Крипторынок
+                </h3>
+                <p class="mt-3 px-1 text-body-sm text-white/60 leading-relaxed">
+                  Сделки по криптовалютам с понятным риском: вход, сопровождение, выход. Всё в реальном времени.
+                </p>
+              </div>
+            </a>
+          </div>
+
+          <!-- 4. MOEX (акции) -->
+          <div class="group">
+            <a href="https://t.me/IntradingMoex" target="_blank" rel="noopener noreferrer" class="block relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+              <div class="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-highlight"></div>
+              <div class="pointer-events-none absolute inset-0 rounded-xl group-hover:shadow-[0_0_15px_var(--highlight)] transition-shadow duration-300"></div>
+              <div class="p-6">
+                <div class="relative rounded-lg border border-white/20 bg-white overflow-hidden">
+                  <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-highlight/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div class="aspect-square w-full flex items-center justify-center p-6">
+                    <img src="./ch-intradingmoex.png" alt="MOEX (акции)" class="w-full h-full object-contain transition-all duration-500 group-hover:scale-105 group-hover:brightness-110" />
+                  </div>
+                </div>
+                <h3 class="mt-5 px-1 text-white font-semibold text-base leading-tight group-hover:text-highlight transition-colors duration-300">
+                  MOEX (акции)
+                </h3>
+                <p class="mt-3 px-1 text-body-sm text-white/60 leading-relaxed">
+                  Идеи и сделки по рынку Мосбиржи: уровни, риск‑план и сопровождение — без «воды».
+                </p>
+              </div>
+            </a>
+          </div>
+
+          <!-- 5. Американский рынок -->
+          <div class="group">
+            <a href="https://t.me/nyseTsU" target="_blank" rel="noopener noreferrer" class="block relative rounded-xl border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+              <div class="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-highlight"></div>
+              <div class="pointer-events-none absolute inset-0 rounded-xl group-hover:shadow-[0_0_15px_var(--highlight)] transition-shadow duration-300"></div>
+              <div class="p-6">
+                <div class="relative rounded-lg border border-white/20 bg-white overflow-hidden">
+                  <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-highlight/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div class="aspect-square w-full flex items-center justify-center p-6">
+                    <img src="./ch-nysetsu.png" alt="Американский рынок" class="w-full h-full object-contain transition-all duration-500 group-hover:scale-105 group-hover:brightness-110" />
+                  </div>
+                </div>
+                <h3 class="mt-5 px-1 text-white font-semibold text-base leading-tight group-hover:text-highlight transition-colors duration-300">
+                  Американский рынок
+                </h3>
+                <p class="mt-3 px-1 text-body-sm text-white/60 leading-relaxed">
+                  Акции и деривативы США: объёмная логика и сценарии сделок с пояснениями и открытой статистикой.
+                </p>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div class="mt-20 pt-10 border-t border-white/10">
+          <p class="text-body-sm text-white/40">
+            Максимальная прозрачность: сделки и статистика публикуются открыто — всё можно проверить самому.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" class="relative py-32 px-4 sm:px-8 lg:px-16 bg-black overflow-hidden">
+      <div class="max-w-6xl mx-auto">
+        <div class="mb-20">
+          <p class="text-body-sm text-white/40 tracking-widest mb-6">Что вы изучите</p>
+          <h2 class="text-h4 sm:text-h3 md:text-h2 lg:text-h1 text-white font-medium mb-6">
+            Программа курса — тариф «Стандарт»
+          </h2>
+          <p class="text-body-lg text-white/60 max-w-2xl">
+            Только то, что реально используется в торговле. Никаких абстрактных теорий — только практика, сценарии и риск‑план.
+          </p>
+        </div>
+
+        <div class="space-y-0 divide-y divide-white/10 border-y border-white/10">
+          <div class="py-5 sm:py-8 lg:py-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 lg:gap-12">
+              <span class="text-body sm:text-body-lg lg:text-h5 text-white/40 font-light shrink-0">[01]</span>
+              <h3 class="text-[20px] leading-snug sm:text-h4 md:text-h3 lg:text-h2 text-white font-normal">Логика объёмов: где «деньги»</h3>
+            </div>
+            <p class="text-body text-white/60 lg:max-w-md lg:text-right">
+              Как объёмы и ликвидность двигают цену. Учимся видеть след капитала и понимать, почему рынок пошёл именно туда.
+            </p>
+          </div>
+          <div class="py-5 sm:py-8 lg:py-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 lg:gap-12">
+              <span class="text-body sm:text-body-lg lg:text-h5 text-white/40 font-light shrink-0">[02]</span>
+              <h3 class="text-[20px] leading-snug sm:text-h4 md:text-h3 lg:text-h2 text-white font-normal">Инструменты и аналитический софт</h3>
+            </div>
+            <p class="text-body text-white/60 lg:max-w-md lg:text-right">
+              Настройка рабочего пространства и чтение рынка: объёмные метрики, подтверждения, точки интереса и отмены сценария.
+            </p>
+          </div>
+          <div class="py-5 sm:py-8 lg:py-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 lg:gap-12">
+              <span class="text-body sm:text-body-lg lg:text-h5 text-white/40 font-light shrink-0">[03]</span>
+              <h3 class="text-[20px] leading-snug sm:text-h4 md:text-h3 lg:text-h2 text-white font-normal">Точный вход: сценарий и подтверждение</h3>
+            </div>
+            <p class="text-body text-white/60 lg:max-w-md lg:text-right">
+              Вход «до пункта» — это не магия. Это сочетание контекста, объёма и точек, где риск контролируем.
+            </p>
+          </div>
+          <div class="py-5 sm:py-8 lg:py-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 lg:gap-12">
+              <span class="text-body sm:text-body-lg lg:text-h5 text-white/40 font-light shrink-0">[04]</span>
+              <h3 class="text-[20px] leading-snug sm:text-h4 md:text-h3 lg:text-h2 text-white font-normal">Риск‑менеджмент и дисциплина</h3>
+            </div>
+            <p class="text-body text-white/60 lg:max-w-md lg:text-right">
+              Размер позиции, лимиты, стоп‑логика и правила «когда не торговать». Стабильность строится на риске.
+            </p>
+          </div>
+          <div class="py-5 sm:py-8 lg:py-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 lg:gap-12">
+              <span class="text-body sm:text-body-lg lg:text-h5 text-white/40 font-light shrink-0">[05]</span>
+              <h3 class="text-[20px] leading-snug sm:text-h4 md:text-h3 lg:text-h2 text-white font-normal">Сопровождение и выход из сделки</h3>
+            </div>
+            <p class="text-body text-white/60 lg:max-w-md lg:text-right">
+              Как вести позицию: цели, частичные фиксации, перенос стопа и выход по сценарию — без хаоса и эмоций.
+            </p>
+          </div>
+          <div class="py-5 sm:py-8 lg:py-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 lg:gap-12">
+              <span class="text-body sm:text-body-lg lg:text-h5 text-white/40 font-light shrink-0">[06]</span>
+              <h3 class="text-[20px] leading-snug sm:text-h4 md:text-h3 lg:text-h2 text-white font-normal">Рынки: FX · FORTS · Crypto · MOEX · US</h3>
+            </div>
+            <p class="text-body text-white/60 lg:max-w-md lg:text-right">
+              Переносим один метод на разные рынки: что меняется в ликвидности, волатильности и правилах исполнения.
+            </p>
+          </div>
+          <div class="py-5 sm:py-8 lg:py-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 lg:gap-12">
+              <span class="text-body sm:text-body-lg lg:text-h5 text-white/40 font-light shrink-0">[07]</span>
+              <h3 class="text-[20px] leading-snug sm:text-h4 md:text-h3 lg:text-h2 text-white font-normal">Практика на реальных сделках</h3>
+            </div>
+            <p class="text-body text-white/60 lg:max-w-md lg:text-right">
+              Разборы ситуаций, домашние задания, обратная связь. Учимся делать выводы и улучшать качество решений.
+            </p>
+          </div>
+          <div class="py-5 sm:py-8 lg:py-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 lg:gap-12">
+              <span class="text-body sm:text-body-lg lg:text-h5 text-white/40 font-light shrink-0">[08]</span>
+              <h3 class="text-[20px] leading-snug sm:text-h4 md:text-h3 lg:text-h2 text-white font-normal">Сборка личного алгоритма</h3>
+            </div>
+            <p class="text-body text-white/60 lg:max-w-md lg:text-right">
+              Итог — ваша система: правила, чек‑лист, дневник и критерии качества сделок. Под ваш стиль и психотип.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-20 border-t border-white/10 pt-16">
+          <p class="text-body-sm text-white/40 tracking-widest mb-6">Тариф «Премиум»</p>
+          <p class="text-body-lg text-white/70 leading-relaxed mb-6">
+            Всё из «Стандарта», плюс три дополнительных блока:
+          </p>
+          <ul class="space-y-4">
+            <li class="flex items-start gap-4">
+              <span class="text-highlight font-medium shrink-0 mt-1">—</span>
+              <span class="text-body-lg text-white/80 leading-relaxed">Углублённый курс по макроэкономике: контекст, новости, циклы</span>
+            </li>
+            <li class="flex items-start gap-4">
+              <span class="text-highlight font-medium shrink-0 mt-1">—</span>
+              <span class="text-body-lg text-white/80 leading-relaxed">Профессиональный курс по опционам: механика, риски, стратегии</span>
+            </li>
+            <li class="flex items-start gap-4">
+              <span class="text-highlight font-medium shrink-0 mt-1">—</span>
+              <span class="text-body-lg text-white/80 leading-relaxed">Приоритетная поддержка и ответы на вопросы</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Works -->
+    <section id="works" class="relative py-32 px-4 sm:px-8 lg:px-16 bg-white overflow-hidden">
+      <div class="max-w-7xl mx-auto mb-20">
+        <p class="text-body-sm text-black/40 tracking-widest mb-6">Кейсы выпускников</p>
+        <h2 class="text-h3 md:text-h2 lg:text-display-lg text-black font-medium mb-8 leading-tight">
+          Результаты учеников
+        </h2>
+        <p class="text-body-lg text-black/60 max-w-3xl">
+          Скриншоты, конкретные цифры, до и после. От хаотичных решений — к торговле по сценарию и риск‑плану.
+        </p>
+        <p class="mt-4 text-sm text-black/40 max-w-3xl">
+          Прошлые результаты не гарантируют будущих. Ключ — навык и соблюдение риск‑менеджмента.
+        </p>
+      </div>
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-12 items-start">
+          <div class="relative bg-black/15 border border-white/10 rounded-xl p-4 sm:p-5 overflow-hidden shadow-lg shadow-black/30">
+            <div class="relative aspect-[2/3] w-full min-h-[320px] overflow-hidden rounded-lg bg-black flex items-center justify-center">
+              <img src="./results1.jpg" alt="Кейс: MOEX / FORTS" class="w-full h-full object-contain" />
+            </div>
+            <p class="mt-3 text-black text-sm sm:text-base font-medium">Результат: +502.47%</p>
+            <ul class="mt-2 text-black/70 text-xs sm:text-sm space-y-1">
+              <li><strong>До:</strong> сделки без системы и контроля риска</li>
+              <li><strong>После:</strong> сценарии, точки отмены и дисциплина</li>
+            </ul>
+          </div>
+          <div class="relative bg-black/15 border border-white/10 rounded-xl p-4 sm:p-5 overflow-hidden shadow-lg shadow-black/30">
+            <div class="relative aspect-[2/3] w-full min-h-[320px] overflow-hidden rounded-lg bg-black flex items-center justify-center">
+              <img src="./results2.jpg" alt="Кейс: Крипторынок" class="w-full h-full object-contain" />
+            </div>
+            <p class="mt-3 text-black text-sm sm:text-base font-medium">Результат: +42.38%</p>
+            <ul class="mt-2 text-black/70 text-xs sm:text-sm space-y-1">
+              <li><strong>До:</strong> импульсивные входы и «догадки»</li>
+              <li><strong>После:</strong> вход по подтверждению и риск‑план</li>
+            </ul>
+          </div>
+          <div class="relative bg-black/15 border border-white/10 rounded-xl p-4 sm:p-5 overflow-hidden shadow-lg shadow-black/30">
+            <div class="relative aspect-[2/3] w-full min-h-[320px] overflow-hidden rounded-lg bg-black flex items-center justify-center">
+              <img src="./results3.jpg" alt="Кейс: Валютный рынок" class="w-full h-full object-contain" />
+            </div>
+            <p class="mt-3 text-black text-sm sm:text-base font-medium">Результат: +8.9%</p>
+            <ul class="mt-2 text-black/70 text-xs sm:text-sm space-y-1">
+              <li><strong>До:</strong> «скачки» результата от сделки к сделке</li>
+              <li><strong>После:</strong> стабильность на дистанции и контроль риска</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="relative py-32 px-4 sm:px-8 lg:px-16 bg-gradient-to-b from-dark-gray to-black overflow-hidden">
+      <div class="max-w-6xl mx-auto">
+        <p class="text-body-sm text-white/40 tracking-widest mb-6 text-center">Живые отзывы</p>
+        <h2 class="text-h2 md:text-h1 lg:text-display-xl text-white font-medium text-center mb-8">
+          Отзывы выпускников
+        </h2>
+        <p class="text-body-lg text-white/60 text-center max-w-2xl mx-auto mb-16">
+          Скриншоты, фото и реальный опыт. Больше — в Telegram:
+          <a href="https://t.me/reviews_STtraining" target="_blank" rel="noreferrer" class="underline underline-offset-4 hover:text-white transition-colors">t.me/reviews_STtraining</a>.
+        </p>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div class="relative bg-black/15 border border-white/10 rounded-xl p-4 sm:p-5 overflow-hidden shadow-lg shadow-black/30">
+            <div class="relative aspect-[2/3] w-full min-h-[320px] overflow-hidden rounded-lg bg-black flex items-center justify-center">
+              <img src="./feedback1.jpg" alt="Отзыв выпускника №1" class="w-full h-full object-contain" />
+            </div>
+          </div>
+          <div class="relative bg-black/15 border border-white/10 rounded-xl p-4 sm:p-5 overflow-hidden shadow-lg shadow-black/30">
+            <div class="relative aspect-[2/3] w-full min-h-[320px] overflow-hidden rounded-lg bg-black flex items-center justify-center">
+              <img src="./feedback2.jpg" alt="Отзыв выпускника №2" class="w-full h-full object-contain" />
+            </div>
+          </div>
+          <div class="relative bg-black/15 border border-white/10 rounded-xl p-4 sm:p-5 overflow-hidden shadow-lg shadow-black/30">
+            <div class="relative aspect-[2/3] w-full min-h-[320px] overflow-hidden rounded-lg bg-black flex items-center justify-center">
+              <img src="./feedback3.jpg" alt="Отзыв выпускника №3" class="w-full h-full object-contain" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing + Contact (simplified static) -->
+    <section id="pricing" class="relative py-32 px-4 sm:px-8 lg:px-16 bg-black overflow-hidden">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-20">
+          <p class="text-body-sm text-white/40 tracking-widest mb-6">Инвестиция в навык</p>
+          <h2 class="text-h2 md:text-h1 lg:text-display-xl text-white font-medium mb-6">Выберите свой тариф</h2>
+          <p class="text-body-lg text-white/60">
+            Старт потока — 15.04.2026. Тарифы отличаются уровнем поддержки и дополнительными модулями.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <article class="pricing-card">
+            <div class="pricing-card__head">
+              <span class="pricing-card__badge">Базовый</span>
+              <h3 class="pricing-card__title">Стандарт</h3>
+              <p class="pricing-card__price">88 500 ₽</p>
+            </div>
+            <ul class="pricing-card__list">
+              <li>Полная программа курса (8 модулей)</li>
+              <li>Практические вебинары и разборы ситуаций</li>
+              <li>Индивидуальные разборы сделок</li>
+              <li>Закрытый чат учеников и выпускников</li>
+              <li>Доступ к материалам остаётся у вас</li>
+            </ul>
+            <div class="pricing-card__foot">
+              <a href="#contact" class="pricing-card__btn">Выбрать тариф</a>
+            </div>
+          </article>
+          <article class="pricing-card pricing-card--featured">
+            <div class="pricing-card__head">
+              <span class="pricing-card__badge">Популярный</span>
+              <h3 class="pricing-card__title">Премиум</h3>
+              <p class="pricing-card__price">194 000 ₽</p>
+            </div>
+            <ul class="pricing-card__list">
+              <li>Всё из тарифа «Стандарт»</li>
+              <li>Углублённый курс по макроэкономике</li>
+              <li>Профессиональный курс по опционам</li>
+              <li>Приоритетная поддержка и ответы</li>
+            </ul>
+            <div class="pricing-card__foot">
+              <a href="#contact" class="pricing-card__btn">Выбрать тариф</a>
+            </div>
+          </article>
+          <article class="pricing-card">
+            <div class="pricing-card__head">
+              <span class="pricing-card__badge">Максимум</span>
+              <h3 class="pricing-card__title">PRO</h3>
+              <p class="pricing-card__price">440 000 ₽</p>
+            </div>
+            <ul class="pricing-card__list">
+              <li>Всё из тарифов «Стандарт» и «Премиум»</li>
+              <li>Обучение арбитражу</li>
+              <li>Личный ментор</li>
+            </ul>
+            <div class="pricing-card__foot">
+              <a href="#contact" class="pricing-card__btn">Выбрать тариф</a>
+            </div>
+          </article>
+        </div>
+        <div class="mt-12 text-center">
+          <a
+            href="#contact"
+            class="inline-flex items-center justify-center px-10 py-4 bg-white text-black text-body font-medium hover:bg-highlight hover:text-white transition-colors duration-300"
+            >Подобрать тариф и записаться</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="relative py-32 px-4 sm:px-8 lg:px-16 bg-black overflow-hidden">
+      <div class="max-w-4xl mx-auto">
+        <p class="text-body-sm text-white/40 tracking-widest mb-6 text-center">Частые вопросы</p>
+        <h2 class="text-h2 md:text-h1 lg:text-display-xl text-white font-medium text-center mb-16">Есть вопросы?</h2>
+        <div class="space-y-6 text-white/70 text-body">
+          <details class="border-b border-white/10 pb-6">
+            <summary class="cursor-pointer text-white py-2">Когда старт потока и сколько длится обучение?</summary>
+            <p class="mt-4 leading-relaxed">Старт потока — 15.04.2026. Длительность ориентировочно около 3 месяцев. Доступ к материалам — безлимитный, остаётся у вас навсегда.</p>
+          </details>
+          <details class="border-b border-white/10 pb-6">
+            <summary class="cursor-pointer text-white py-2">Кому подойдёт этот курс?</summary>
+            <p class="mt-4 leading-relaxed">Новичкам — чтобы сразу выстроить правильную базу. Практикующим — чтобы систематизировать подход, усилить риск-менеджмент и выйти на стабильный результат.</p>
+          </details>
+          <details class="border-b border-white/10 pb-6">
+            <summary class="cursor-pointer text-white py-2">Есть ли рассрочка?</summary>
+            <p class="mt-4 leading-relaxed">Да, доступна рассрочка от банков-партнёров на 3, 6 или 12 месяцев.</p>
+          </details>
+          <details class="border-b border-white/10 pb-6">
+            <summary class="cursor-pointer text-white py-2">Будет ли разбор реальных рыночных ситуаций?</summary>
+            <p class="mt-4 leading-relaxed">Да. Разбираем реальный рынок и реальные сделки: сценарий, вход, сопровождение, выход и ошибки.</p>
+          </details>
+          <details class="border-b border-white/10 pb-6">
+            <summary class="cursor-pointer text-white py-2">Как устроена поддержка во время и после обучения?</summary>
+            <p class="mt-4 leading-relaxed">Помимо прямой связи с ментором, вы получаете доступ в закрытый чат с учениками текущего и прошлых потоков. Можно задавать вопросы, разбирать сделки и развиваться в среде единомышленников.</p>
+          </details>
+          <details class="border-b border-white/10 pb-6">
+            <summary class="cursor-pointer text-white py-2">Сколько времени нужно уделять обучению?</summary>
+            <p class="mt-4 leading-relaxed">Средняя продолжительность занятия — около 1 часа. Все уроки публикуются в видеоформате, смотреть можно в любое удобное время.</p>
+          </details>
+          <details class="border-b border-white/10 pb-6">
+            <summary class="cursor-pointer text-white py-2">Где посмотреть сделки и статистику команды?</summary>
+            <p class="mt-4 leading-relaxed">
+              В разделе <a href="#channels" class="underline underline-offset-4">«Telegram-каналы»</a> — там ссылки на все наши каналы с реальными сделками в режиме онлайн. Можно зайти и проверить до покупки.
+            </p>
+          </details>
+          <details class="border-b border-white/10 pb-6">
+            <summary class="cursor-pointer text-white py-2">Чем этот курс отличается от других?</summary>
+            <p class="mt-4 leading-relaxed">Мы торгуем в реальном времени и показываем сделки открыто в Telegram — до результата, не постфактум. В основе курса — объёмный подход (объёмы = деньги), а не индикаторы и шаблоны. Никаких обещаний быстрых денег.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="relative py-32 px-4 sm:px-8 lg:px-16 bg-black overflow-hidden">
+      <div class="max-w-4xl mx-auto">
+        <p class="text-body-sm text-white/40 tracking-widest mb-6">Старт потока 15.04.2026</p>
+        <h2 class="text-h2 md:text-h1 text-white font-medium mb-6">Записаться на курс</h2>
+        <p class="text-body-lg text-white/60 mb-12">
+          Оставьте заявку — поможем подобрать тариф, ответим на вопросы и при необходимости отправим ссылки на наши Telegram-каналы с реальными сделками.
+        </p>
+        <form id="lead-form" class="space-y-6" novalidate>
+          <input
+            name="name"
+            autocomplete="name"
+            required
+            class="w-full bg-transparent border-b border-white/20 py-3 text-white focus:outline-none"
+            placeholder="Имя *"
+          />
+          <input
+            name="telegram"
+            autocomplete="username"
+            class="w-full bg-transparent border-b border-white/20 py-3 text-white focus:outline-none"
+            placeholder="Telegram (@username)"
+          />
+          <input
+            name="email"
+            type="email"
+            autocomplete="email"
+            class="w-full bg-transparent border-b border-white/20 py-3 text-white focus:outline-none"
+            placeholder="Email (если нет Telegram)"
+          />
+          <textarea
+            name="message"
+            class="w-full bg-transparent border-b border-white/20 py-3 text-white focus:outline-none resize-none"
+            rows="4"
+            placeholder="Сообщение"
+          ></textarea>
+          <p class="text-body-sm text-white/40">Укажите имя и хотя бы Telegram или Email.</p>
+          <button type="submit" class="mt-2 px-10 py-4 bg-white text-black text-body font-medium hover:bg-highlight hover:text-white transition-colors duration-300 disabled:opacity-50">
+            Записаться на курс
+          </button>
+          <p id="lead-form-status" class="text-body-sm mt-4 min-h-[1.25rem]" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative pt-16 sm:pt-20 pb-12 px-4 sm:px-8 lg:px-16 bg-black overflow-hidden">
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+          <div class="space-y-4">
+            <a href="#hero" class="block text-body text-white/60 hover:text-white transition-colors duration-300">Главная</a>
+            <a href="#services" class="block text-body text-white/60 hover:text-white transition-colors duration-300">Программа</a>
+            <a href="#channels" class="block text-body text-white/60 hover:text-white transition-colors duration-300">Сделки в Telegram</a>
+            <a href="#works" class="block text-body text-white/60 hover:text-white transition-colors duration-300">Результаты</a>
+            <a href="#pricing" class="block text-body text-white/60 hover:text-white transition-colors duration-300">Тарифы</a>
+            <a href="./oferta/" class="block text-body text-white/60 hover:text-white transition-colors duration-300">Оферта</a>
+            <a href="./politika/" class="block text-body text-white/60 hover:text-white transition-colors duration-300">Политика</a>
+            <a href="./risks/" class="block text-body text-white/60 hover:text-white transition-colors duration-300">Риски</a>
+          </div>
+          <div class="space-y-4">
+            <a href="https://t.me/reviews_STtraining" target="_blank" rel="noreferrer" class="flex items-center gap-2 text-body text-white/60 hover:text-white transition-colors duration-300">
+              <span class="inline-block w-4 h-4" style="transform: translateY(-1px);">✈</span>
+              Telegram
+            </a>
+            <a href="https://t.me/reviews_STtraining" target="_blank" rel="noreferrer" class="block text-body text-white/60 hover:text-white transition-colors duration-300">Отзывы выпускников</a>
+            <a href="#contact" class="block text-body text-white/60 hover:text-white transition-colors duration-300">Контакты</a>
+          </div>
+          <div class="sm:col-span-2 lg:text-right">
+            <a href="#contact" class="inline-flex items-center gap-3 text-h5 lg:text-h4 text-white font-medium hover:text-highlight transition-colors duration-300">Записаться</a>
+          </div>
+        </div>
+        <div class="mt-20 pt-8 border-t border-white/10 flex flex-col lg:flex-row justify-between items-center gap-4">
+          <p class="text-body-sm text-white/40">© 2026 Trader's University. Все права защищены.</p>
+          <p class="text-body-sm text-white/30">14 лет экспертизы в трейдинге</p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        const btn = document.getElementById("mobile-menu-toggle");
+        const menu = document.getElementById("mobile-menu");
+        if (!btn || !menu) return;
+
+        function setExpanded(isExpanded) {
+          btn.setAttribute("aria-expanded", String(!!isExpanded));
+        }
+
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          const isHidden = menu.classList.contains("hidden");
+          menu.classList.toggle("hidden");
+          setExpanded(isHidden);
+        });
+
+        document.addEventListener("click", function (e) {
+          if (menu.classList.contains("hidden")) return;
+          const target = e.target;
+          if (menu.contains(target) || btn.contains(target)) return;
+          menu.classList.add("hidden");
+          setExpanded(false);
+        });
+
+        menu.querySelectorAll("a").forEach(function (a) {
+          a.addEventListener("click", function () {
+            menu.classList.add("hidden");
+            setExpanded(false);
+          });
+        });
+
+        window.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            menu.classList.add("hidden");
+            setExpanded(false);
+          }
+        });
+      })();
+
+      (function () {
+        var TG_BOT_TOKEN = "8748697920:AAGAdo2QT5zYAPW1n_8ZYUrc7ZIs7rOFjt4";
+        var TG_CHAT_IDS = ["572193621", "497905638", "774449935"];
+
+        var form = document.getElementById("lead-form");
+        if (!form) return;
+        var status = document.getElementById("lead-form-status");
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var name = (form.elements.name && form.elements.name.value) ? form.elements.name.value.trim() : "";
+          var telegram = (form.elements.telegram && form.elements.telegram.value) ? form.elements.telegram.value.trim() : "";
+          var email = (form.elements.email && form.elements.email.value) ? form.elements.email.value.trim() : "";
+          var message = (form.elements.message && form.elements.message.value) ? form.elements.message.value.trim() : "";
+          if (!name || (!telegram && !email)) {
+            if (status) {
+              status.textContent = "Укажите имя и Telegram или Email.";
+              status.className = "text-body-sm text-highlight mt-4 min-h-[1.25rem]";
+            }
+            return;
+          }
+          if (!TG_BOT_TOKEN) {
+            if (status) {
+              status.textContent = "В скрипте не задан TG_BOT_TOKEN.";
+              status.className = "text-body-sm text-highlight mt-4 min-h-[1.25rem]";
+            }
+            return;
+          }
+
+          var text =
+            "<b>Новая заявка с сайта</b>\n\n" +
+            "<b>Имя:</b> " + escapeHtml(name) + "\n" +
+            "<b>Telegram:</b> " + escapeHtml(telegram || "—") + "\n" +
+            "<b>Email:</b> " + escapeHtml(email || "—") + "\n\n" +
+            "<b>Сообщение:</b>\n" +
+            escapeHtml(message || "—");
+
+          var submitBtn = form.querySelector('[type="submit"]');
+          if (submitBtn) submitBtn.disabled = true;
+          if (status) {
+            status.textContent = "Отправка…";
+            status.className = "text-body-sm text-white/60 mt-4 min-h-[1.25rem]";
+          }
+
+          var api = "https://api.telegram.org/bot" + TG_BOT_TOKEN + "/sendMessage";
+          Promise.all(
+            TG_CHAT_IDS.map(function (chatId) {
+              return fetch(api, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text: text,
+                  parse_mode: "HTML",
+                  disable_web_page_preview: true,
+                }),
+              }).then(function (r) {
+                return r.json().then(function (j) {
+                  return { ok: r.ok && j && j.ok, body: j };
+                });
+              });
+            })
+          )
+            .then(function (results) {
+              var allOk = results.every(function (x) {
+                return x.ok;
+              });
+              if (allOk) {
+                if (status) {
+                  status.textContent = "Спасибо! Мы свяжемся с вами.";
+                  status.className = "text-body-sm text-white mt-4 min-h-[1.25rem]";
+                }
+                form.reset();
+              } else {
+                var desc = (results[0] && results[0].body && results[0].body.description) ? results[0].body.description : "Ошибка Telegram.";
+                if (status) {
+                  status.textContent = desc;
+                  status.className = "text-body-sm text-highlight mt-4 min-h-[1.25rem]";
+                }
+              }
+            })
+            .catch(function () {
+              if (status) {
+                status.textContent = "Нет сети. Проверьте подключение.";
+                status.className = "text-body-sm text-highlight mt-4 min-h-[1.25rem]";
+              }
+            })
+            .finally(function () {
+              if (submitBtn) submitBtn.disabled = false;
+            });
+        });
+
+        function escapeHtml(s) {
+          return String(s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+        }
+      })();
+    </script>
+  </body>
+</html>

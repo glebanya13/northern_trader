@@ -1,0 +1,9 @@
+[
+  {
+    "origin": ["https://my-blog-1766143027.web.app", "http://localhost:5000", "http://localhost:3000"],
+    "method": ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type", "Authorization"]
+  }
+]
+

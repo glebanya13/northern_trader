@@ -1,0 +1,19 @@
+{
+  "name": "Volume Trading PRO 2026 — Trader's University",
+  "short_name": "Volume Trading PRO",
+  "icons": [
+    {
+      "src": "/landing/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/landing/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0a0a0a",
+  "background_color": "#0a0a0a",
+  "display": "standalone"
+}
