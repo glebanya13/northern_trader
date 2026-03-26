@@ -1,16 +1,16 @@
-# northern_trader
+# 🧠 Northern Trader
+Northern Trader is a mobile application designed to provide a seamless and intuitive experience for users to manage their channels, reviews, and chat functionality.
 
-A new Flutter project.
+## 🤝 Contributing
+To contribute to the application, follow these steps:
+1. Fork the repository using `git fork https://github.com/username/repository.git`
+2. Create a new branch using `git branch feature/branch-name`
+3. Make changes to the code and commit them using `git commit -m "commit message"`
+4. Push the changes to the remote repository using `git push origin feature/branch-name`
+5. Create a pull request to merge the changes into the main branch
 
-## Getting Started
+## 📝 License
+The application is licensed under the MIT License.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 📬 Contact
+To contact the developers, fill out the contact form or send an email to [glebanya.com@gmail.com](mailto:glebanya.com@gmail.com).
