@@ -14,17 +14,10 @@ final authStateProvider = StreamProvider<User?>((ref) {
 });
 
 final userDataAuthProvider = FutureProvider<UserModel?>((ref) async {
-  final authState = ref.watch(authStateProvider);
-  
-  return authState.when(
-    data: (user) async {
-      if (user == null) return null;
-      final authController = ref.watch(authControllerProvider);
-      return await authController.getUserData();
-    },
-    loading: () => null,
-    error: (_, __) => null,
-  );
+  final user = await ref.watch(authStateProvider.future);
+  if (user == null) return null;
+  final authController = ref.read(authControllerProvider);
+  return authController.getUserData();
 });
 
 class AuthController {

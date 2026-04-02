@@ -28,13 +28,15 @@ class AuthRepository {
     if (auth.currentUser == null) {
       return null;
     }
-    // Даём время подхватить токен Auth для Firestore (важно для web)
-    await auth.currentUser?.getIdToken(true);
-    await Future.delayed(const Duration(milliseconds: 200));
+    // Try to ensure token exists without forcing refresh (faster on slow networks).
+    await auth.currentUser?.getIdToken();
 
     String uid = auth.currentUser!.uid;
 
-    var userData = await firestore.collection('users').doc(uid).get();
+    var userData =
+        await firestore.collection('users').doc(uid).get().timeout(
+              const Duration(seconds: 8),
+            );
 
     UserModel? user;
     if (userData.exists && userData.data() != null) {
@@ -84,15 +86,16 @@ class AuthRepository {
         email: email.trim(),
         password: password,
       );
-      // Чтобы Firestore получил токен до первого запроса (избегаем permission-denied на web)
-      await auth.currentUser?.getIdToken(true);
-      await Future.delayed(const Duration(milliseconds: 300));
+      // Do not force token refresh here; it can significantly slow down web startup.
+      await auth.currentUser?.getIdToken();
 
       String uid = auth.currentUser!.uid;
-      var userDoc = await firestore.collection('users').doc(uid).get();
+      var userDoc =
+          await firestore.collection('users').doc(uid).get().timeout(
+                const Duration(seconds: 8),
+              );
       
       if (userDoc.exists && userDoc.data() != null) {
-        await Future.delayed(const Duration(milliseconds: 500));
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
@@ -186,8 +189,6 @@ class AuthRepository {
       );
 
       await firestore.collection('users').doc(uid).set(user.toMap());
-
-      await Future.delayed(const Duration(milliseconds: 500));
       
       Navigator.pushAndRemoveUntil(
         context,

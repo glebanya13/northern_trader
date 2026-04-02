@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -13,33 +16,111 @@ import 'package:northern_trader/firebase_options.dart';
 import 'package:northern_trader/router.dart';
 import 'package:northern_trader/mobile_layout_screen.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  try {
-    // Firebase may already be initialized when app is restarted (debug/hot reload).
-    // In that case we'd get: [core/duplicate-app]. We can safely ignore it.
+void main() {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    if (kIsWeb) {
+      ErrorWidget.builder = (FlutterErrorDetails details) {
+        return ColoredBox(
+          color: Colors.black,
+          child: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: SelectableText(
+                details.exceptionAsString(),
+                style: const TextStyle(
+                  color: Colors.redAccent,
+                  fontSize: 13,
+                  height: 1.35,
+                ),
+              ),
+            ),
+          ),
+        );
+      };
+      FlutterError.onError = (FlutterErrorDetails details) {
+        FlutterError.presentError(details);
+      };
+    }
+
     try {
-      if (Firebase.apps.isEmpty) {
+      // Firebase may already be initialized when app is restarted (debug/hot reload).
+      // In that case we'd get: [core/duplicate-app]. We can safely ignore it.
+      try {
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
+      } catch (e) {
+        final message = e.toString();
+        if (message.contains("duplicate-app")) {
+          // Ignore duplicate initialization of default "[DEFAULT]" app.
+        } else {
+          rethrow;
+        }
       }
-    } catch (e) {
-      final message = e.toString();
-      if (message.contains("duplicate-app")) {
-        // Ignore duplicate initialization of default "[DEFAULT]" app.
-      } else {
-        rethrow;
+    } catch (e, stack) {
+      if (kIsWeb) {
+        runApp(
+          MaterialApp(
+            home: Scaffold(
+              backgroundColor: Colors.black,
+              body: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: SelectableText(
+                    'Firebase init failed:\n'
+                    'type: ${e.runtimeType}\n'
+                    'message: $e\n'
+                    'apiKey: ${DefaultFirebaseOptions.web.apiKey.isNotEmpty}\n'
+                    'appId: ${DefaultFirebaseOptions.web.appId}\n'
+                    'projectId: ${DefaultFirebaseOptions.web.projectId}\n'
+                    '\n$stack',
+                    style: const TextStyle(
+                      color: Colors.redAccent,
+                      fontSize: 13,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        return;
       }
+      rethrow;
     }
-  } catch (e) {
-    rethrow;
-  }
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+
+    runApp(
+      const ProviderScope(
+        child: MyApp(),
+      ),
+    );
+  }, (Object error, StackTrace stack) {
+    if (kIsWeb) {
+      runApp(
+        MaterialApp(
+          home: Scaffold(
+            backgroundColor: Colors.black,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: SelectableText(
+                  'Uncaught zone error:\n$error\n\n$stack',
+                  style: const TextStyle(
+                    color: Colors.redAccent,
+                    fontSize: 13,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  });
 }
 
 class MyApp extends ConsumerWidget {
@@ -58,7 +139,7 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData.light().copyWith(
         scaffoldBackgroundColor: colors.backgroundColor,
         appBarTheme: AppBarTheme(
-          color: colors.appBarColor,
+          backgroundColor: colors.appBarColor,
           iconTheme: IconThemeData(color: colors.textColor),
           titleTextStyle: TextStyle(
             color: colors.textColor,
@@ -87,7 +168,7 @@ class MyApp extends ConsumerWidget {
       darkTheme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: colors.backgroundColor,
         appBarTheme: AppBarTheme(
-          color: colors.appBarColor,
+          backgroundColor: colors.appBarColor,
           iconTheme: IconThemeData(color: colors.textColor),
           titleTextStyle: TextStyle(
             color: colors.textColor,
